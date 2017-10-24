@@ -1,7 +1,7 @@
 package server;
 
 import util.NetworkedPlayer;
-
+// TODO rename to 'ServerPlayer'
 public class serverPlayer extends NetworkedPlayer {
 
 	@Override
