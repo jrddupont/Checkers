@@ -1,4 +1,4 @@
-package client;
+package gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -11,41 +11,47 @@ import java.net.URISyntaxException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 
-public class MenuPanel extends JPanel{
+import client.Driver;
+
+@SuppressWarnings("serial")
+public class MenuPanel extends AbstractMenuPanel{
 	JButton localPlayButton = new JButton("Local Play");
 	JButton onlinePlayButton = new JButton("Online Play");
 	JButton optionsButton = new JButton("Options");
 	JButton rulesButton = new JButton("Rules");
+	Driver driver;
 	
-	public MenuPanel(){
-		setPreferredSize(new Dimension(300, 600));
+	public MenuPanel(Driver d){
+		super();
+		driver = d;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));	// Set the panel to a vertical layout
 		
-		localPlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
-		onlinePlayButton.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
-		optionsButton.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
-		rulesButton.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
+		JButton[] allButtons = {localPlayButton, onlinePlayButton, optionsButton, rulesButton};
 		
 		add( Box.createVerticalGlue() );	// Add the labels to the panel and align them horizontally (The glue objects take up space)
-		add(localPlayButton);
-		add(onlinePlayButton);
-		add(optionsButton);
-		add(rulesButton);
+		
+		for(JButton button : allButtons){
+			button.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
+			button.setMaximumSize(new Dimension(size.width / 2, button.getPreferredSize().height));
+			add(button);
+			add(Box.createRigidArea(new Dimension(0, padding)));
+		}
 		add( Box.createVerticalGlue() );
+		
+		
 		
 		
 		localPlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				
 			}
 		});
 		onlinePlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				driver.switchMenu(new ServerBrowserPanel());
 			}
 		});
 		optionsButton.addActionListener(new ActionListener() {
