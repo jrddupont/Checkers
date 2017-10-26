@@ -25,7 +25,6 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 	
 	public ServerBrowserPanel(){
 		super();
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));	// Set the panel to a vertical layout
 		serverTextField.setColumns(100);
 		serverTextField.setMaximumSize( new Dimension(serverTextField.getPreferredSize().width, connectButton.getPreferredSize().height)  );
 		

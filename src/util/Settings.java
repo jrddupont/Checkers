@@ -1,34 +1,57 @@
 package util;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileReader;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.colorchooser.AbstractColorChooserPanel;
+import javax.swing.colorchooser.ColorSelectionModel;
+
+import gui.Theme;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Settings {
 	
-	public static final Color defaultLightBoardColor =	new Color(255, 255, 255);
-	public static final Color defaultDarkBoardColor = 	new Color( 85, 107,  47);
-	public static final Color defaultPlayer1Color =		new Color(  0,   0,   0);
-	public static final Color defaultPlayer2Color =		new Color(255,   0,   0);
-	public static final Color defaultKingColor = 		new Color(212, 175,  55);
+	// Put information you want saved here
+	public Theme currentTheme;
+	// Put information you want saved here
 	
-	
-	public Color lightBoardColor;
-	public Color darkBoardColor;
-	public Color player1Color;
-	public Color player2Color;
-	public Color kingColor;
 	
 	public Settings(){
-		lightBoardColor = defaultLightBoardColor;
-		darkBoardColor = defaultDarkBoardColor;
-		player1Color = defaultPlayer1Color;
-		player2Color = defaultPlayer2Color;
-		kingColor = defaultKingColor;
+		currentTheme = new Theme();
 	}
 	
-	public String getJSONString(){
-		return "";
+	public Settings(String input){
+		
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(input);
+		} catch (ParseException e) { }
+        JSONObject jsonData = (JSONObject)obj;
+        
+        
+        JSONObject themeJSON = (JSONObject) jsonData.get("theme");
+        currentTheme = new Theme(themeJSON); 
 	}
-	public void readJSONString(){
-
+	
+	@SuppressWarnings("unchecked")
+	public String getJSONString(){
+		JSONObject mainJSON = new JSONObject();
+		
+		mainJSON.put("theme", currentTheme.getJSONObject());
+		
+		return mainJSON.toJSONString();
 	}
 }

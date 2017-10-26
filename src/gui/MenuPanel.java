@@ -12,6 +12,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
+import util.Settings;
 import client.Driver;
 
 @SuppressWarnings("serial")
@@ -22,10 +23,11 @@ public class MenuPanel extends AbstractMenuPanel{
 	JButton rulesButton = new JButton("Rules");
 	Driver driver;
 	
+	Settings settings = new Settings();
+	
 	public MenuPanel(Driver d){
 		super();
 		driver = d;
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));	// Set the panel to a vertical layout
 		
 		JButton[] allButtons = {localPlayButton, onlinePlayButton, optionsButton, rulesButton};
 		
@@ -57,7 +59,7 @@ public class MenuPanel extends AbstractMenuPanel{
 		optionsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				driver.switchMenu(new SettingsPanel(settings));
 			}
 		});
 		rulesButton.addActionListener(new ActionListener() {
