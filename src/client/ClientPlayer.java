@@ -1,5 +1,6 @@
 package client;
 
+import util.Board;
 import util.NetworkedPlayer;
 
 public class ClientPlayer extends NetworkedPlayer{
@@ -20,6 +21,12 @@ public class ClientPlayer extends NetworkedPlayer{
 	public void sendPacket(byte opCode, String data) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Board getMove(Board board) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

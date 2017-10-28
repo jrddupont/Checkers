@@ -1,8 +1,15 @@
 package server;
 
+import java.net.Socket;
+
+import util.Board;
 import util.NetworkedPlayer;
-// TODO rename to 'ServerPlayer'
-public class serverPlayer extends NetworkedPlayer {
+
+public class ServerPlayer extends NetworkedPlayer {
+	
+	public ServerPlayer(Socket socket) {
+		
+	}
 
 	@Override
 	public void processPacket(String json) {
@@ -20,6 +27,12 @@ public class serverPlayer extends NetworkedPlayer {
 	public void sendPacket(byte opCode, String data) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Board getMove(Board board) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

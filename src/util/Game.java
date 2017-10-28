@@ -15,4 +15,10 @@ public class Game {
 	private Board board;
 	private int gameID;
 
+	GameState gameState;
+	
+	Game(Player p1, Player p2)
+	{
+		gameState = new GameState(p1, p2);
+	}
 }
