@@ -1,16 +1,27 @@
 package util;
 
+// This will act as a struct
+// With love,
+//  Dan and Ben
+
 public class GameState {
 
-	Player P1;
-	Player P2;
+	public Player redPlayer = null;
+	public Player blackPlayer = null;
 	
-	Board board = new Board();
+	public Board board = new Board();
 	
-	GameState(Player p1, Player p2)
-	{
-		P1 = p1;
-		P2 = p2;
-	}
+	public String redUserName = null;
+	public int redWins = 0;
+	public int redLosses = 0;
+	public int redTies = 0;
+	
+	public String blackUserName = null;
+	public int blackWins = 0;
+	public int blackLosses = 0;
+	public int blackTies = 0;
+	
+	public int turn = 0;
+	public int gameID = 0;
 	
 }

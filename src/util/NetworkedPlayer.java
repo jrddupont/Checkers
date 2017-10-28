@@ -3,28 +3,32 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.json.simple.JSONObject;
+
 public abstract class NetworkedPlayer extends Player {
 	
-	final private byte HELLO = 0;
-	final private byte EXIT = 1;
-	final private byte AUNTENTICATE = 2;
-	final private byte GAME_START = 3;
-	final private byte GAME_END = 4;
-	final private byte REMATCH_REQUEST = 5;
-	final private byte MOVE_REQUEST = 6;
+	final protected byte HELLO = 0;
+	final protected byte EXIT = 1;
+	final protected byte AUNTENTICATE = 2;
+	final protected byte GAME_START = 3;
+	final protected byte GAME_END = 4;
+	final protected byte REMATCH_REQUEST = 5;
+	final protected byte MOVE_REQUEST = 6;
 	
-	private Socket socket;
+	protected Socket socket;
+	protected int port = 12321;
+	protected String serverIP = "127.0.0.1";
+	protected BufferedReader buffReader;
 	
-	private BufferedReader buffReader;
 	
+	protected abstract void processPacket(JSONObject json);
 	
-	public abstract void processPacket(String json);
+	protected abstract JSONObject getMail();
 	
-	public abstract String getMail();
-	
-	public abstract void sendPacket(byte opCode, String data);
+	protected abstract void sendPacket(byte opCode, Object data);
 	
 }
