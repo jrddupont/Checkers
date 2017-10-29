@@ -32,10 +32,7 @@ public class ClientPlayer extends NetworkedPlayer{
 			{
 				try {
 					socket.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				try {
+				
 					socket = new Socket(serverIP, ((Long) json.get("Port")).intValue());
 					port = ((Long) json.get("Port")).intValue();
 				} catch (IOException e) {
@@ -95,6 +92,7 @@ public class ClientPlayer extends NetworkedPlayer{
 		p.sendPacket(p.HELLO, -47);
 		p.processPacket(p.getMail());
 		System.out.println(p.socket.getPort());
+		p.getMail();
 		
 	}
 

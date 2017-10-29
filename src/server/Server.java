@@ -35,6 +35,9 @@ public class Server {
 	
 	Map<Integer, Game> games = new TreeMap<Integer, Game>();
 	
+	/*
+	 * Sever starts and waits for new players that want to join or make a game. 
+	 */
 	@SuppressWarnings("unchecked")
 	public Server(int port) {
 		
@@ -76,13 +79,16 @@ public class Server {
 					
 					int gameID = ((Long)data.get("GameID")).intValue();
 					
+					// the player wants to join an existing game
 					if(games.containsKey(gameID)) {
+						// if that game is waiting for a player
 						if((tempGame = games.get(gameID)).getGameState().blackPlayer == null) {
 							tempPlayer = new ServerPlayer();
 							gamePort = tempPlayer.getServerPort();
 							
 							tempGame.getGameState().blackPlayer = tempPlayer;
 						} else {
+							// reply with an error code in the port
 							data.put("Opcode", HELLO);
 							data.put("Port", -1);
 							
@@ -92,6 +98,7 @@ public class Server {
 						}
 						
 					} else {
+					  // the player wants to make a new game
 						tempGS = new GameState();
 						
 						tempPlayer = new ServerPlayer();
