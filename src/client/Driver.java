@@ -2,30 +2,34 @@ package client;
 
 import gui.AbstractMenuPanel;
 import gui.MenuPanel;
+import gui.Theme;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-@SuppressWarnings("serial")
-public class Driver extends JFrame {
+import util.Settings;
+
+public class Driver  {
     public static void main(String[] args){
     	new Driver();
+    	Settings.currentTheme = new Theme();
     }
     
+    public static JFrame mainFrame = new JFrame();
     public Driver(){
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setSize(AbstractMenuPanel.size);
-		AbstractMenuPanel currentPanel = new MenuPanel(this);
-		getContentPane().add(currentPanel);
-		setVisible(true);
+    	mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    	mainFrame.setSize(AbstractMenuPanel.size);
+		AbstractMenuPanel currentPanel = new MenuPanel();
+		mainFrame.getContentPane().add(currentPanel);
+		mainFrame.setVisible(true);
     }
     
-    public void switchMenu(AbstractMenuPanel panel){
-    	getContentPane().removeAll();
+    public static void switchMenu(AbstractMenuPanel panel){
+    	mainFrame.getContentPane().removeAll();
     	
-    	getContentPane().add(panel);
+    	mainFrame.getContentPane().add(panel);
     	
-    	getContentPane().revalidate();
-    	getContentPane().repaint();
+    	mainFrame.getContentPane().revalidate();
+    	mainFrame.getContentPane().repaint();
     }
 }

@@ -9,10 +9,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 
-import util.Settings;
 import client.Driver;
 
 @SuppressWarnings("serial")
@@ -21,13 +19,10 @@ public class MenuPanel extends AbstractMenuPanel{
 	JButton onlinePlayButton = new JButton("Online Play");
 	JButton optionsButton = new JButton("Options");
 	JButton rulesButton = new JButton("Rules");
-	Driver driver;
 	
-	Settings settings = new Settings();
 	
-	public MenuPanel(Driver d){
+	public MenuPanel(){
 		super();
-		driver = d;
 		
 		JButton[] allButtons = {localPlayButton, onlinePlayButton, optionsButton, rulesButton};
 		
@@ -47,19 +42,19 @@ public class MenuPanel extends AbstractMenuPanel{
 		localPlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Driver.switchMenu(new GamePanel());
 			}
 		});
 		onlinePlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				driver.switchMenu(new ServerBrowserPanel());
+				Driver.switchMenu(new ServerBrowserPanel());
 			}
 		});
 		optionsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				driver.switchMenu(new SettingsPanel(settings));
+				Driver.switchMenu(new SettingsPanel());
 			}
 		});
 		rulesButton.addActionListener(new ActionListener() {

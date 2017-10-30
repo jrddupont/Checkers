@@ -1,8 +1,8 @@
 package gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -10,8 +10,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,7 +18,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
@@ -33,6 +30,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import util.Settings;
+import client.Driver;
 
 @SuppressWarnings("serial")
 public class SettingsPanel extends AbstractMenuPanel{
@@ -47,23 +45,32 @@ public class SettingsPanel extends AbstractMenuPanel{
 	JButton saveThemeButton = new JButton("Save theme");
 	JButton removeThemeButton = new JButton("Remove theme");
 	
+	SmallColorChooser scc = new SmallColorChooser();
+	
 	JButton changeLightColorButton =	new JButton("Change light square color");
 	JButton changeDarkColorButton =		new JButton("Change dark square color");
 	JButton changeP1ColorButton =		new JButton("Change player 1 color");
 	JButton changeP2ColorButton =		new JButton("Change player 2 color");
 	JButton changeKingColorButton =		new JButton("Change king color");
 	
-	Settings settings;
+	JButton mainMenuButton =			new JButton("Main menu");
 	
-	public SettingsPanel(Settings settings){
+	ThemePreviewPanel themePreviewPanel;
+	
+	
+	public SettingsPanel(){
 		super();
 		padding /= 2;
 		
-		this.settings = settings;
 		
+		themeChoiceSelector = new JComboBox<String>();
+		themes = new HashMap<String, Theme>();
+		loadThemes();
 		refreshComboBox();
 		
-		JButton[] buttons = {saveThemeButton, removeThemeButton, changeLightColorButton, changeDarkColorButton, changeP1ColorButton, changeP2ColorButton, changeKingColorButton};
+		themePreviewPanel = new ThemePreviewPanel(Settings.currentTheme);
+		
+		JButton[] buttons = {saveThemeButton, removeThemeButton, changeLightColorButton, changeDarkColorButton, changeP1ColorButton, changeP2ColorButton, changeKingColorButton, mainMenuButton};
 		
 		for(JButton button : buttons){
 			button.setAlignmentX(Component.CENTER_ALIGNMENT);	// Center align the labels
@@ -88,6 +95,8 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    add(Box.createRigidArea(new Dimension(0, padding)));
 	    add(changeKingColorButton);
 	    add(Box.createRigidArea(new Dimension(0, padding)));
+	    add(themePreviewPanel);
+	    add(Box.createRigidArea(new Dimension(0, padding)));
 	    
 	    add( Box.createVerticalGlue() );	// Add the labels to the panel and align them horizontally (The glue objects take up space)
 	    
@@ -96,25 +105,40 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    add(saveThemeButton);
 	    add(Box.createRigidArea(new Dimension(0, padding)));
 	    add(removeThemeButton);
+	    add(Box.createRigidArea(new Dimension(0, padding)));
+	    add(mainMenuButton);
 	    
 	    themeChoiceSelector.addActionListener(new ActionListener() {
-			@SuppressWarnings("rawtypes")
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JComboBox cb = (JComboBox)e.getSource();
-				settings.currentTheme = themes.get(cb.getSelectedItem());
-				for(String s : themes.keySet()){
-					System.out.println(s);
+				@SuppressWarnings("unchecked")
+				JComboBox<String> comboBox = (JComboBox<String>)e.getSource();
+				if(comboBox.getItemCount() < 1){
+					return;
 				}
-				System.out.println(settings.currentTheme);
-				themeNameField.setText(settings.currentTheme.name);
+				Settings.currentTheme = themes.get(comboBox.getSelectedItem());
+				themePreviewPanel.currentTheme = Settings.currentTheme;
+				themeNameField.setText(Settings.currentTheme.name);
 			}
 		});
 	    
 	    saveThemeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				Theme newTheme = new Theme(Settings.currentTheme);
+				newTheme.name = themeNameField.getText();
+				themes.put(themeNameField.getText(), newTheme);
+				saveThemes();
+				refreshComboBox();
+			}
+		});
+	    
+	    removeThemeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				themes.remove(themeNameField.getText());
+				saveThemes();
+				refreshComboBox();
 			}
 		});
 	    
@@ -131,26 +155,96 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    	}
 	    });
 
-	    
 	    changeLightColorButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ActionListener returnListener = new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						
+						Settings.currentTheme.lightBoardColor = scc.getColor();
+						repaint();
 					}
 				};
-				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, new SmallColorChooser(settings.currentTheme.lightBoardColor), returnListener,null);
+				scc.setColor(Settings.currentTheme.lightBoardColor);
+				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, scc, returnListener,null);
 				jdi.setVisible(true);
+			}
+		});
+	    
+	    changeDarkColorButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ActionListener returnListener = new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Settings.currentTheme.darkBoardColor = scc.getColor();
+						repaint();
+					}
+				};
+				scc.setColor(Settings.currentTheme.darkBoardColor);
+				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, scc, returnListener,null);
+				jdi.setVisible(true);
+			}
+		});
+	    
+	    changeP1ColorButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ActionListener returnListener = new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Settings.currentTheme.player1Color = scc.getColor();
+						repaint();
+					}
+				};
+				scc.setColor(Settings.currentTheme.player1Color);
+				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, scc, returnListener,null);
+				jdi.setVisible(true);
+			}
+		});
+	    
+	    changeP2ColorButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ActionListener returnListener = new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Settings.currentTheme.player2Color = scc.getColor();
+						repaint();
+					}
+				};
+				scc.setColor(Settings.currentTheme.player2Color);
+				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, scc, returnListener,null);
+				jdi.setVisible(true);
+			}
+		});
+	    
+	    changeKingColorButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ActionListener returnListener = new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Settings.currentTheme.kingColor = scc.getColor();
+						repaint();
+					}
+				};
+				scc.setColor(Settings.currentTheme.kingColor);
+				JDialog jdi = JColorChooser.createDialog(null, "Choose a color", true, scc, returnListener,null);
+				jdi.setVisible(true);
+			}
+		});
+	    
+	    mainMenuButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Driver.switchMenu(new MenuPanel());
 			}
 		});
 	}
 	
-	@SuppressWarnings("rawtypes")
 	private void refreshComboBox(){
-		themes = new HashMap<String, Theme>();
-		loadThemes();
+		
 		if(themes.size() == 0){
 			themes.put("Default", new Theme());
 		}
@@ -161,14 +255,19 @@ public class SettingsPanel extends AbstractMenuPanel{
 			choices[i] = key;
 			i++;
 		}
+		
+		themeChoiceSelector.removeAllItems();
+	    for(String s : choices){
+	    	themeChoiceSelector.addItem(s);
+	    }
 	    
-	    themeChoiceSelector = new JComboBox<String>(choices);
 	    themeChoiceSelector.setSelectedIndex(0);
-	    
-	    themeNameField.setText("Default");
+	    themeNameField.setText(choices[0]);
+	    Settings.currentTheme = themes.get(choices[0]);
 	}
 	
 	private void loadThemes(){
+		themes.clear();
 		JSONParser parser = new JSONParser();
 		try {
 			JSONArray jsonArray = (JSONArray) ((JSONObject) parser.parse(new FileReader(themePath))).get("themes");
@@ -182,28 +281,34 @@ public class SettingsPanel extends AbstractMenuPanel{
 		} catch (IOException | ParseException e) { e.printStackTrace(); }
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void saveThemes() throws FileNotFoundException{
+	@SuppressWarnings({ "unchecked" })
+	private void saveThemes() {
 		JSONObject output = new JSONObject();
 		JSONArray themeArray = new JSONArray();
 	   
 		for(String key : themes.keySet()){
-			themeArray.add( themes.get(key) );
+			if(themes.get(key).name == null){
+				continue;
+			}
+			themeArray.add( themes.get(key).getJSONObject() );
 		}
 	    
 	    output.put("themes", themeArray);
 	    
-	    PrintWriter out = new PrintWriter(themePath);
+	    PrintWriter out = null;
+		try {
+			out = new PrintWriter(themePath);
+		} catch (FileNotFoundException e) {
+			return;
+		}
 	    out.print(output.toJSONString());
+	    out.flush();
 	    out.close();
 	}
 	
 	
-	
-	public class SmallColorChooser extends JColorChooser{
-		Color defaultColor;
-		public SmallColorChooser(Color defaultColor){
-			setColor(defaultColor);
+	private class SmallColorChooser extends JColorChooser{
+		public SmallColorChooser(){
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			
 			this.setAlignmentX(LEFT_ALIGNMENT);
@@ -222,6 +327,36 @@ public class SettingsPanel extends AbstractMenuPanel{
 				current = (JComponent) current.getComponents()[0]; 
 			}
 			current.removeAll();
+		}
+	}
+	
+	private class ThemePreviewPanel extends JComponent{
+		public Theme currentTheme;
+		public ThemePreviewPanel(Theme defaultTheme){
+			currentTheme = defaultTheme;
+			setPreferredSize(new Dimension(size.width, size.width));
+		}
+		@Override
+		public void paint(Graphics g){
+			int height = Math.min(getHeight(), getWidth() / 2);
+			
+			g.setColor(currentTheme.lightBoardColor);
+			g.fillRect(0, 0, height * 2, height);
+			
+			g.setColor(currentTheme.darkBoardColor);
+			g.fillRect(0, 0, height/2, height/2);
+			g.fillRect(height/2, height/2, height/2, height/2);
+			g.fillRect(height, 0, height/2, height/2);
+			g.fillRect(height + height/2, height/2, height/2, height/2);
+			
+			g.setColor(currentTheme.player1Color);
+			g.fillOval(0, 0, height/2, height/2);
+			
+			g.setColor(currentTheme.player2Color);
+			g.fillOval(height + height/2, height/2, height/2, height/2);
+			
+			g.setColor(currentTheme.kingColor);
+			g.fillOval( height/8, height/8, height/4, height/4);
 		}
 	}
 }

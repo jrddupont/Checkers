@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -16,12 +18,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import client.Driver;
+
 @SuppressWarnings("serial")
 public class ServerBrowserPanel extends AbstractMenuPanel{
 	
 	JTextField serverTextField = new JTextField("");
 	JButton connectButton = new JButton("Connect");
 	DefaultListModel<String> listModel = new DefaultListModel<String>();
+	
+	JButton mainMenuButton =			new JButton("Main menu");
 	
 	public ServerBrowserPanel(){
 		super();
@@ -50,6 +56,8 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 		add(inputContainer);
 		add(Box.createRigidArea(new Dimension(0, padding)));
 		add(listScroller);
+		add(Box.createRigidArea(new Dimension(0, padding)));
+		add(mainMenuButton);
 		
 		initServerList();
 
@@ -61,7 +69,13 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 				}
 			}
 		});
-
+		
+		mainMenuButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Driver.switchMenu(new MenuPanel());
+			}
+		});
 		
 	}
 	

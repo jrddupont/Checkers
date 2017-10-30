@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 public abstract class AbstractMenuPanel extends JPanel{
-	public static final Dimension size = new Dimension(300, 500);
+	public static final Dimension size = new Dimension(400, 600);
 	public int padding = 20;
 	public AbstractMenuPanel() {
 		setPreferredSize(size);

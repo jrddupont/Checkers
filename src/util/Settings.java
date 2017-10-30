@@ -1,22 +1,7 @@
 package util;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.FileReader;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.colorchooser.AbstractColorChooserPanel;
-import javax.swing.colorchooser.ColorSelectionModel;
-
 import gui.Theme;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -24,7 +9,7 @@ import org.json.simple.parser.ParseException;
 public class Settings {
 	
 	// Put information you want saved here
-	public Theme currentTheme;
+	public static Theme currentTheme;
 	// Put information you want saved here
 	
 	

@@ -36,6 +36,15 @@ public class Theme {
 		kingColor = new Color(((Long) json.get("king")).intValue());
 	}
 
+	public Theme(Theme oldTheme) {
+		name = oldTheme.name;
+		lightBoardColor = oldTheme.lightBoardColor;
+		darkBoardColor = oldTheme.darkBoardColor;
+		player1Color = oldTheme.player1Color;
+		player2Color = oldTheme.player2Color;
+		kingColor = oldTheme.kingColor;
+	}
+
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSONObject() {
 		JSONObject output = new JSONObject();
