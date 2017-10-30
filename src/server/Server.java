@@ -17,6 +17,7 @@ import org.json.simple.parser.ParseException;
 
 import util.Game;
 import util.GameState;
+import util.NetworkedPlayer;
 
 public class Server {
 	
@@ -85,8 +86,9 @@ public class Server {
 						if((tempGame = games.get(gameID)).getGameState().blackPlayer == null) {
 							tempPlayer = new ServerPlayer();
 							gamePort = tempPlayer.getServerPort();
-							
 							tempGame.getGameState().blackPlayer = tempPlayer;
+							tempPlayer.Open(gamePort);
+							System.out.println("Second player joined game "+gameID);
 						} else {
 							// reply with an error code in the port
 							data.put("Opcode", HELLO);
@@ -95,6 +97,7 @@ public class Server {
 							printer = new PrintWriter(socket.getOutputStream(), true);
 							
 							printer.println(data.toJSONString());
+							System.out.println("Player tried to join full game "+gameID);
 						}
 						
 					} else {
@@ -103,21 +106,46 @@ public class Server {
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
+						tempPlayer.Open(gamePort);
 						
 						tempGS.redPlayer = tempPlayer;
 						
 						games.put(gameID, new Game(tempGS));
+						System.out.println("First player joined vacant game "+gameID);
 					}
 					
-					data = new JSONObject();
+					JSONObject out = new JSONObject();
 					
-					data.put("Opcode", HELLO);
-					data.put("Port", gamePort);
+					out.put("Opcode", HELLO);
+					out.put("Port", gamePort);
 					
 					printer = new PrintWriter(socket.getOutputStream(), true);
 					
-					printer.println(data.toJSONString());
-				
+					printer.println(out.toJSONString());
+					
+					if(games.get(gameID).getGameState().blackPlayer != null)
+					{
+						tempGS = games.get(gameID).getGameState();
+						out = new JSONObject();
+						out.put("Opcode", MOVE_REQUEST);
+						out.put("redUserName", tempGS.redUserName);
+						out.put("blackUserName", tempGS.blackUserName);
+						out.put("redWins", tempGS.redWins);
+						out.put("blackWins", tempGS.blackWins);
+						out.put("redLosses", tempGS.redLosses);
+						out.put("blackLosses", tempGS.blackLosses);
+						out.put("redTies", tempGS.redTies);
+						out.put("blackTies", tempGS.blackTies);
+						out.put("gameID", tempGS.gameID);
+						out.put("Red", tempGS.board.board[0]);
+						out.put("Black", tempGS.board.board[1]);
+						out.put("King", tempGS.board.board[2]);
+						
+						((NetworkedPlayer) games.get(gameID).getGameState().redPlayer).sendPacket(out);
+						((NetworkedPlayer) games.get(gameID).getGameState().blackPlayer).sendPacket(out);
+						//games.get(gameID).startGame(); //Evan pls
+						System.out.println("Game"+gameID+"started!");
+					}
 				}
 					
 				
@@ -127,13 +155,9 @@ public class Server {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		
+		}	
 	}
-	
-	static public void main(String args[]) {
-		Server serverDriver = new Server(12321);
+	public static void main(String[] args) {
+		Server server = new Server(12321);
 	}
-	
 }

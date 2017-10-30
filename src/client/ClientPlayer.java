@@ -10,10 +10,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import util.Board;
+import util.GameState;
 import util.NetworkedPlayer;
 
 public class ClientPlayer extends NetworkedPlayer{
 	
+	public GameState game = new GameState();
 	public ClientPlayer()
 	{
 		try {
@@ -32,52 +34,42 @@ public class ClientPlayer extends NetworkedPlayer{
 			{
 				try {
 					socket.close();
-				
 					socket = new Socket(serverIP, ((Long) json.get("Port")).intValue());
 					port = ((Long) json.get("Port")).intValue();
+					System.out.println("Joined game");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 			break;
-		}
-		
-	}
-
-	@Override
-	public JSONObject getMail() {
-		JSONParser parser = new JSONParser();
-		JSONObject data=null;
-		try {
-			buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			data = (JSONObject) ((Object) parser.parse(buffReader.readLine()));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return data;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void sendPacket(byte opCode, Object data) {
-		JSONObject out = new JSONObject();
-		
-		out.put("Opcode", opCode);
-		out.put("GameID", data);
-		
-		PrintWriter printer;
-		try {
-			printer = new PrintWriter(socket.getOutputStream(), true);
-			printer.println(out.toJSONString());
-		} catch (IOException e) {
+		case GAME_START:
+			game.redUserName = json.get("redUserName").toString();
+			game.blackUserName = json.get("blackUserName").toString();
+			game.redWins = ((Long) json.get("redWins")).intValue();
+			game.blackWins = ((Long) json.get("blackWins")).intValue();
+			game.redLosses = ((Long) json.get("redLosses")).intValue();
+			game.blackLosses = ((Long) json.get("blackLosses")).intValue();
+			game.redTies = ((Long) json.get("redTies")).intValue();
+			game.blackTies = ((Long) json.get("blackTies")).intValue();
+			game.gameID = ((Long) json.get("gameID")).intValue();
+			game.board.board[0] = ((Long) json.get("Red")).intValue();
+			game.board.board[1] = ((Long) json.get("Black")).intValue();
+			game.board.board[2] = ((Long) json.get("King")).intValue();
+			System.out.println("Game started!");
+			break;
+		case MOVE_REQUEST:
+			game.board = (Board) json.get("data");
+			//indicate player turn
+			//wait for player to make move
 			
-			e.printStackTrace();
+			JSONObject out = new JSONObject();
+			out.put("Opcode", MOVE_REQUEST);
+			out.put("Red", game.board.board[0]);
+			out.put("Black", game.board.board[1]);
+			out.put("King", game.board.board[2]);
+			sendPacket(out);
+			break;
 		}
-		
 	}
 
 	@Override
@@ -85,15 +77,4 @@ public class ClientPlayer extends NetworkedPlayer{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public static void main(String args[])
-	{
-		ClientPlayer p = new ClientPlayer();
-		System.out.println(p.socket.getPort());
-		p.sendPacket(p.HELLO, -47);
-		p.processPacket(p.getMail());
-		System.out.println(p.socket.getPort());
-		p.getMail();
-		
-	}
-
 }

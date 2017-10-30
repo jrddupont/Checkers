@@ -4,7 +4,7 @@ import java.net.Socket;
 
 public abstract class Player {
 	
-	private String color;
+	public String color;
 	
 	public abstract Board getMove(Board board);
 	

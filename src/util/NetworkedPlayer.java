@@ -3,11 +3,14 @@ package util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public abstract class NetworkedPlayer extends Player {
 	
@@ -18,7 +21,6 @@ public abstract class NetworkedPlayer extends Player {
 	final protected byte GAME_END = 4;
 	final protected byte REMATCH_REQUEST = 5;
 	final protected byte MOVE_REQUEST = 6;
-	
 	protected Socket socket;
 	protected int port = 12321;
 	protected String serverIP = "127.0.0.1";
@@ -27,8 +29,35 @@ public abstract class NetworkedPlayer extends Player {
 	
 	protected abstract void processPacket(JSONObject json);
 	
-	protected abstract JSONObject getMail();
+	public JSONObject getMail()
+	{
+		JSONParser parser = new JSONParser();
+		JSONObject data=null;
+		try {
+			buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			System.out.println("1");
+			data = (JSONObject) ((Object) parser.parse(buffReader.readLine()));
+			System.out.println("2");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return data;
+	}
 	
-	protected abstract void sendPacket(byte opCode, Object data);
-	
+	@SuppressWarnings("unchecked")
+	public void sendPacket(JSONObject data)
+	{	
+		PrintWriter printer;
+		try {
+			printer = new PrintWriter(socket.getOutputStream(), true);
+			printer.println(data.toJSONString());
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+	}	
 }

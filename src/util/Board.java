@@ -7,7 +7,7 @@ public class Board {
 	public static final int PLAYER_2	= 1;
 	public static final int KING 		= 2;
 	
-	private int[] board;
+	public int[] board = new int[3];
 	private int importantMagicNumber = 0b10101101010101100100101010101001;
 	public static void main(String[] args){
 	}

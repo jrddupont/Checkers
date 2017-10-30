@@ -14,14 +14,25 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import util.Board;
+import util.GameState;
 import util.NetworkedPlayer;
 
 public class ServerPlayer extends NetworkedPlayer {
-	ServerSocket ssocket;
-	
+	public Board board = new Board();
+	ServerSocket tempSocket;
 	public ServerPlayer() {
 		try {
-			ssocket = new ServerSocket(0);
+			tempSocket = new ServerSocket(0);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void Open(int port) {
+		try {
+			System.out.println("1");
+			socket = tempSocket.accept();
+			System.out.println("1");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -30,30 +41,30 @@ public class ServerPlayer extends NetworkedPlayer {
 
 	@Override
 	public void processPacket(JSONObject json) {
-		// TODO Auto-generated method stub
-		
+		switch(((Long) json.get("Opcode")).byteValue())
+		{
+		case MOVE_REQUEST:
+			board = (Board) json.get("Board");
+			break;
+		}	
 	}
 
-	@Override
-	public JSONObject getMail() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void sendPacket(byte opCode, Object data) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public Board getMove(Board board) {
-		// TODO Auto-generated method stub
-		return null;
+		JSONObject out = new JSONObject();
+		out.put("Opcode", MOVE_REQUEST);
+		out.put("Red", board.board[0]);
+		out.put("Black", board.board[1]);
+		out.put("King", board.board[2]);
+		sendPacket(out);
+		processPacket(getMail());
+		return board;
 	}
 	
 	public int getServerPort() {
-		return ssocket.getLocalPort();
+		int tempPort = tempSocket.getLocalPort();
+		return tempPort;
 	}
 
 }
