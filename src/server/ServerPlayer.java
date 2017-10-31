@@ -1,33 +1,28 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
+
+import org.json.simple.JSONObject;
 
 import util.Board;
-import util.GameState;
 import util.NetworkedPlayer;
 
-public class ServerPlayer extends NetworkedPlayer {
+public class ServerPlayer extends NetworkedPlayer 
+							implements Runnable{
 	public Board board = new Board();
-	ServerSocket tempSocket;
+	ServerSocket ssocket;
+	
 	public ServerPlayer() {
 		try {
-			tempSocket = new ServerSocket(0);
+			ssocket = new ServerSocket(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	/*
 	public void Open(int port) {
 		try {
 			System.out.println("1");
@@ -38,6 +33,7 @@ public class ServerPlayer extends NetworkedPlayer {
 			e.printStackTrace();
 		}
 	}
+	*/
 
 	@Override
 	public void processPacket(JSONObject json) {
@@ -63,8 +59,23 @@ public class ServerPlayer extends NetworkedPlayer {
 	}
 	
 	public int getServerPort() {
-		int tempPort = tempSocket.getLocalPort();
+		while(ssocket == null) System.out.printf("nullllll\n");
+		
+		int tempPort = ssocket.getLocalPort();
 		return tempPort;
 	}
 
+	@Override
+	public synchronized void run() {
+		try {
+			System.out.printf("creating socket\n");
+			socket = ssocket.accept();
+			System.out.printf("socket created\n");
+			
+			notifyAll();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

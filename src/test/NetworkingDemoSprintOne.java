@@ -24,6 +24,6 @@ public class NetworkingDemoSprintOne {
 		p3.sendPacket(out);
 		p1.processPacket(p1.getMail());
 		p2.processPacket(p2.getMail());
-		p3.processPacket(p3.getMail());
+	//	p3.processPacket(p3.getMail());
 	}
 }

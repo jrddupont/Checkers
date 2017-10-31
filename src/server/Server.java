@@ -56,10 +56,14 @@ public class Server {
 		
 		
 		try {
+			System.out.printf("starting server\n");
 			ssocket = new ServerSocket(port);
 			
 			for(;;) {
+				System.out.printf("waiting for new player to connect...\n");
 				socket = ssocket.accept();
+				System.out.printf("connected to new player\n");
+				
 				buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				
 				try {
@@ -82,12 +86,19 @@ public class Server {
 					
 					// the player wants to join an existing game
 					if(games.containsKey(gameID)) {
+						System.out.printf("new player is joining existing game\n");
+						
 						// if that game is waiting for a player
 						if((tempGame = games.get(gameID)).getGameState().blackPlayer == null) {
 							tempPlayer = new ServerPlayer();
+							
 							gamePort = tempPlayer.getServerPort();
+							new Thread(tempPlayer).start();
+							System.out.printf("gameport: %d\n", gamePort);
+							
+							
 							tempGame.getGameState().blackPlayer = tempPlayer;
-							tempPlayer.Open(gamePort);
+							
 							System.out.println("Second player joined game "+gameID);
 						} else {
 							// reply with an error code in the port
@@ -98,15 +109,22 @@ public class Server {
 							
 							printer.println(data.toJSONString());
 							System.out.println("Player tried to join full game "+gameID);
+							continue;
 						}
 						
 					} else {
 					  // the player wants to make a new game
+						
+						System.out.printf("new player is joining a new game\n");
+						
 						tempGS = new GameState();
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
-						tempPlayer.Open(gamePort);
+						System.out.printf("gameport: %d\n", gamePort);
+						
+						new Thread(tempPlayer).start();
+						
 						
 						tempGS.redPlayer = tempPlayer;
 						
@@ -141,7 +159,7 @@ public class Server {
 						out.put("Black", tempGS.board.board[1]);
 						out.put("King", tempGS.board.board[2]);
 						
-						((NetworkedPlayer) games.get(gameID).getGameState().redPlayer).sendPacket(out);
+						((NetworkedPlayer) games.get(gameID).getGameState().redPlayer).sendPacket(out); 
 						((NetworkedPlayer) games.get(gameID).getGameState().blackPlayer).sendPacket(out);
 						//games.get(gameID).startGame(); //Evan pls
 						System.out.println("Game"+gameID+"started!");
