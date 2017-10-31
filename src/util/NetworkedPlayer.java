@@ -35,9 +35,7 @@ public abstract class NetworkedPlayer extends Player {
 		JSONObject data = null;
 		try {
 			buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			System.out.println("1");
 			data = (JSONObject) ((Object) parser.parse(buffReader.readLine()));
-			System.out.println("2");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

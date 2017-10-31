@@ -37,12 +37,12 @@ public class ClientPlayer extends NetworkedPlayer{
 					port = ((Long) json.get("Port")).intValue();
 					
 					socket = new Socket(serverIP, port);
-					
-					System.out.println("Joined game");
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				System.out.printf("Accepted into a game\n");
 			}
+			else System.out.printf("Tried to join a full game\n");
 			break;
 		case GAME_START:
 			game.redUserName = json.get("redUserName").toString();
@@ -57,6 +57,7 @@ public class ClientPlayer extends NetworkedPlayer{
 			game.board.board[0] = ((Long) json.get("Red")).intValue();
 			game.board.board[1] = ((Long) json.get("Black")).intValue();
 			game.board.board[2] = ((Long) json.get("King")).intValue();
+			System.out.printf("Joined game %d\n", game.gameID);
 			System.out.println("Game started!");
 			break;
 		case MOVE_REQUEST:

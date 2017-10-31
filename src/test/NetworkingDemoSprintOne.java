@@ -31,6 +31,25 @@ public class NetworkingDemoSprintOne {
 		
 		alice.processPacket(alice.getMail());
 		bob.processPacket(bob.getMail());
-	//	p3.processPacket(p3.getMail());
+		
+		charles.processPacket(charles.getMail());
+		
+		alice.processPacket(alice.getMail());
+		bob.processPacket(bob.getMail());	
+		
+		out.put("GameID", 7);
+		charles = new ClientPlayer();
+		charles.sendPacket(out);
+		
+		out.put("Username", "david");
+		ClientPlayer david = new ClientPlayer();
+		david.sendPacket(out);
+		
+		charles.processPacket(charles.getMail());
+		david.processPacket(david.getMail());
+		
+		charles.processPacket(charles.getMail());
+		david.processPacket(david.getMail());		
+		
 	}
 }

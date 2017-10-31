@@ -94,6 +94,7 @@ public class Server {
 							new Thread(tempPlayer).start();							
 							
 							tempGame.getGameState().blackPlayer = tempPlayer;
+							tempGame.getGameState().blackUserName = playerName;
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
@@ -111,6 +112,8 @@ public class Server {
 					} else {
 					  // the player wants to make a new game						
 						tempGS = new GameState();
+						tempGS.gameID = gameID;
+						tempGS.redUserName = playerName;
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
@@ -137,7 +140,7 @@ public class Server {
 					{
 						tempGS = games.get(gameID).getGameState();
 						out = new JSONObject();
-						out.put("Opcode", MOVE_REQUEST);
+						out.put("Opcode", GAME_START);
 						out.put("redUserName", tempGS.redUserName);
 						out.put("blackUserName", tempGS.blackUserName);
 						out.put("redWins", tempGS.redWins);
@@ -155,7 +158,6 @@ public class Server {
 						((NetworkedPlayer) games.get(gameID).getGameState().blackPlayer).sendPacket(out);
 						//games.get(gameID).startGame(); //Evan pls
 						
-						System.out.printf("sent gamestates to players\n");
 						System.out.printf("Game %d started\n", gameID);
 					}
 				}
