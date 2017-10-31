@@ -29,20 +29,14 @@ public class ClientPlayer extends NetworkedPlayer{
 	public void processPacket(JSONObject json) {
 		switch(((Long) json.get("Opcode")).byteValue())
 		{
-		case HELLO:
-			System.out.printf("got hello packet\n");
-			
+		case HELLO:			
 			if(((Long) json.get("Port")).intValue() > 0)
 			{
 				try {
 					socket.close();
 					port = ((Long) json.get("Port")).intValue();
 					
-					System.out.printf("port: %d\n", port);
-					
 					socket = new Socket(serverIP, port);
-					
-					System.out.printf("created socket\n");
 					
 					System.out.println("Joined game");
 				} catch (IOException e) {

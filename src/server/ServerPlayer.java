@@ -21,19 +21,6 @@ public class ServerPlayer extends NetworkedPlayer
 			e.printStackTrace();
 		}
 	}
-	
-	/*
-	public void Open(int port) {
-		try {
-			System.out.println("1");
-			socket = tempSocket.accept();
-			System.out.println("1");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	*/
 
 	@Override
 	public void processPacket(JSONObject json) {
@@ -68,9 +55,7 @@ public class ServerPlayer extends NetworkedPlayer
 	@Override
 	public synchronized void run() {
 		try {
-			System.out.printf("creating socket\n");
 			socket = ssocket.accept();
-			System.out.printf("socket created\n");
 			
 			notifyAll();
 		} catch (IOException e) {

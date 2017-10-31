@@ -56,11 +56,11 @@ public class Server {
 		
 		
 		try {
-			System.out.printf("starting server\n");
+			System.out.printf("Starting server\n");
 			ssocket = new ServerSocket(port);
 			
 			for(;;) {
-				System.out.printf("waiting for new player to connect...\n");
+				System.out.printf("\nwaiting for new player to connect...\n");
 				socket = ssocket.accept();
 				System.out.printf("connected to new player\n");
 				
@@ -85,21 +85,17 @@ public class Server {
 					int gameID = ((Long)data.get("GameID")).intValue();
 					
 					// the player wants to join an existing game
-					if(games.containsKey(gameID)) {
-						System.out.printf("new player is joining existing game\n");
-						
+					if(games.containsKey(gameID)) {						
 						// if that game is waiting for a player
 						if((tempGame = games.get(gameID)).getGameState().blackPlayer == null) {
 							tempPlayer = new ServerPlayer();
 							
 							gamePort = tempPlayer.getServerPort();
-							new Thread(tempPlayer).start();
-							System.out.printf("gameport: %d\n", gamePort);
-							
+							new Thread(tempPlayer).start();							
 							
 							tempGame.getGameState().blackPlayer = tempPlayer;
 							
-							System.out.println("Second player joined game "+gameID);
+							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
 							// reply with an error code in the port
 							data.put("Opcode", HELLO);
@@ -108,20 +104,16 @@ public class Server {
 							printer = new PrintWriter(socket.getOutputStream(), true);
 							
 							printer.println(data.toJSONString());
-							System.out.println("Player tried to join full game "+gameID);
+							System.out.printf("%s tried to join full game %d\n", playerName, gameID);
 							continue;
 						}
 						
 					} else {
-					  // the player wants to make a new game
-						
-						System.out.printf("new player is joining a new game\n");
-						
+					  // the player wants to make a new game						
 						tempGS = new GameState();
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
-						System.out.printf("gameport: %d\n", gamePort);
 						
 						new Thread(tempPlayer).start();
 						
@@ -129,7 +121,7 @@ public class Server {
 						tempGS.redPlayer = tempPlayer;
 						
 						games.put(gameID, new Game(tempGS));
-						System.out.println("First player joined vacant game "+gameID);
+						System.out.printf("%s joined vacant game %d\n", playerName, gameID);
 					}
 					
 					JSONObject out = new JSONObject();
@@ -162,11 +154,12 @@ public class Server {
 						((NetworkedPlayer) games.get(gameID).getGameState().redPlayer).sendPacket(out); 
 						((NetworkedPlayer) games.get(gameID).getGameState().blackPlayer).sendPacket(out);
 						//games.get(gameID).startGame(); //Evan pls
-						System.out.println("Game"+gameID+"started!");
+						
+						System.out.printf("sent gamestates to players\n");
+						System.out.printf("Game %d started\n", gameID);
 					}
 				}
 					
-				
 				socket.close();
 			}
 			

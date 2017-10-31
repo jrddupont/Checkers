@@ -51,16 +51,11 @@ public abstract class NetworkedPlayer extends Player {
 	@SuppressWarnings("unchecked")
 	public synchronized void sendPacket(JSONObject data)
 	{	
-		System.out.printf("socket null: %b\n", socket == null);
-		while(socket == null) {
-			try {
-				System.out.printf("waiting");
-				wait();
-				System.out.printf("running");
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		try {
+			while(socket == null) wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		PrintWriter printer;

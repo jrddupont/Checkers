@@ -11,19 +11,26 @@ public class NetworkingDemoSprintOne {
 	final protected static byte HELLO = 0;
 	
 	public static void main(String[] args) {
-		ClientPlayer p1 = new ClientPlayer();
-		ClientPlayer p2 = new ClientPlayer();
-		ClientPlayer p3 = new ClientPlayer();
+		ClientPlayer alice = new ClientPlayer();
+		ClientPlayer bob = new ClientPlayer();
+		ClientPlayer charles = new ClientPlayer();
+		
 		
 		JSONObject out = new JSONObject();
 		out.put("Opcode", HELLO);
 		out.put("GameID", 3);
 		
-		p1.sendPacket(out);
-		p2.sendPacket(out);
-		p3.sendPacket(out);
-		p1.processPacket(p1.getMail());
-		p2.processPacket(p2.getMail());
+		out.put("Username", "alice");
+		alice.sendPacket(out);
+		
+		out.put("Username", "bob");
+		bob.sendPacket(out);
+		
+		out.put("Username", "charles");
+		charles.sendPacket(out);
+		
+		alice.processPacket(alice.getMail());
+		bob.processPacket(bob.getMail());
 	//	p3.processPacket(p3.getMail());
 	}
 }
