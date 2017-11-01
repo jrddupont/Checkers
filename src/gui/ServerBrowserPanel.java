@@ -87,6 +87,9 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 		listModel.addElement("to.");
 	}
 	public void updateServerList(String[] servers){
-		
+		listModel.clear();
+		for(String server : servers){
+			listModel.addElement(server);
+		}
 	}
 }

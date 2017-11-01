@@ -19,7 +19,7 @@ public class GamePanel extends AbstractMenuPanel{
 	
 	public GamePanel(){
 		super();
-		JButton mainMenuButton =			new JButton("Main menu");
+		JButton mainMenuButton = new JButton("Main menu");
 		add(new GameBoardUI());
 		add(mainMenuButton);
 		
