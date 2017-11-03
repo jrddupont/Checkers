@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import util.Board;
 import util.NetworkedPlayer;
+import util.Netwrk;
 
 public class ServerPlayer extends NetworkedPlayer 
 							implements Runnable{
@@ -26,7 +27,7 @@ public class ServerPlayer extends NetworkedPlayer
 	public void processPacket(JSONObject json) {
 		switch(((Long) json.get("Opcode")).byteValue())
 		{
-		case MOVE_REQUEST:
+		case Netwrk.MOVE_REQUEST:
 			board = (Board) json.get("Board");
 			break;
 		}	
@@ -36,7 +37,7 @@ public class ServerPlayer extends NetworkedPlayer
 	@Override
 	public Board getMove(Board board) {
 		JSONObject out = new JSONObject();
-		out.put("Opcode", MOVE_REQUEST);
+		out.put("Opcode", Netwrk.MOVE_REQUEST);
 		out.put("Red", board.board[0]);
 		out.put("Black", board.board[1]);
 		out.put("King", board.board[2]);

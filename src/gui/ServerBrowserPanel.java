@@ -30,6 +30,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import client.Driver;
+import util.Netwrk;
 
 @SuppressWarnings("serial")
 public class ServerBrowserPanel extends AbstractMenuPanel{
@@ -109,7 +110,6 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 	
 	// XXX will be moved to another helper class at a later date
 	// this turned out much uglier than intended
-	final protected byte SERVER_LIST_REQUEST = 7;
 	
 	/*
 	 * Talks to server, receives list of games that are waiting
@@ -127,7 +127,7 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			JSONObject data = new JSONObject();
 			JSONParser parser = new JSONParser();
 			
-			data.put("Opcode", SERVER_LIST_REQUEST);
+			data.put(Netwrk.OPCODE, Netwrk.SERVER_LIST_REQUEST);
 			
 			
 			PrintWriter printer = new PrintWriter(socket.getOutputStream(), true);
@@ -137,20 +137,16 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			
 			String done = "false";
 			
-			while( done.equals("false") ) {
+			while( !done.equals("null") ) {
 				data = (JSONObject) ((Object) parser.parse(buffReader.readLine()));
 				
-				System.out.printf("in while\n");
-				
 				// stupid check
-				if( ((Long)data.get("Opcode")).byteValue() == SERVER_LIST_REQUEST) {
+				if( ((Long)data.get(Netwrk.OPCODE)).byteValue() == Netwrk.SERVER_LIST_REQUEST) {
 					
-					if( (done = data.get("Done").toString()).equals("false")) {
+					if( !(done = data.get(Netwrk.PLAYER_ONE_UNAME).toString()).equals("null")) {
 						servers.add( 
 							String.format("GameID: %d Opponent: %s", 
-								((Long)data.get("GameID")).intValue(), data.get("Player1").toString()) );
-						
-						System.out.printf("here 2\n");
+								((Long)data.get(Netwrk.GAME_ID)).intValue(), data.get(Netwrk.PLAYER_ONE_UNAME).toString()) );
 					}	
 				}
 			}			

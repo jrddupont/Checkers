@@ -12,16 +12,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import util.Netwrk;
+
 public abstract class NetworkedPlayer extends Player {
-	
-	final protected byte HELLO = 0;
-	final protected byte EXIT = 1;
-	final protected byte AUNTENTICATE = 2;
-	final protected byte GAME_START = 3;
-	final protected byte GAME_END = 4;
-	final protected byte REMATCH_REQUEST = 5;
-	final protected byte MOVE_REQUEST = 6;
-	final private byte SERVER_LIST_REQUEST = 7;
 	
 	protected Socket socket = null;
 	protected int port = 12321;
