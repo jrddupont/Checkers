@@ -21,6 +21,8 @@ public abstract class NetworkedPlayer extends Player {
 	final protected byte GAME_END = 4;
 	final protected byte REMATCH_REQUEST = 5;
 	final protected byte MOVE_REQUEST = 6;
+	final private byte SERVER_LIST_REQUEST = 7;
+	
 	protected Socket socket = null;
 	protected int port = 12321;
 	protected String serverIP = "127.0.0.1";

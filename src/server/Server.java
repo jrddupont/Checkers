@@ -28,13 +28,16 @@ public class Server {
 	final private byte GAME_END = 4;
 	final private byte REMATCH_REQUEST = 5;
 	final private byte MOVE_REQUEST = 6;
+	final private byte SERVER_LIST_REQUEST = 7;
 	
-	ServerSocket ssocket;
-	Socket socket;
-	BufferedReader buffReader;
-	PrintWriter printer;
+	private ServerSocket ssocket;
+	private Socket socket;
+	private BufferedReader buffReader;
+	private PrintWriter printer;
 	
-	Map<Integer, Game> games = new TreeMap<Integer, Game>();
+	private Map<Integer, Game> games = new TreeMap<Integer, Game>();
+	
+	final private JSONObject out = new JSONObject();
 	
 	/*
 	 * Sever starts and waits for new players that want to join or make a game. 
@@ -53,6 +56,8 @@ public class Server {
 		ServerPlayer tempPlayer;
 		String playerName;
 		int gamePort = 0;
+		
+		
 		
 		
 		try {
@@ -127,7 +132,7 @@ public class Server {
 						System.out.printf("%s joined vacant game %d\n", playerName, gameID);
 					}
 					
-					JSONObject out = new JSONObject();
+					
 					
 					out.put("Opcode", HELLO);
 					out.put("Port", gamePort);
@@ -139,7 +144,7 @@ public class Server {
 					if(games.get(gameID).getGameState().blackPlayer != null)
 					{
 						tempGS = games.get(gameID).getGameState();
-						out = new JSONObject();
+						out.clear();
 						out.put("Opcode", GAME_START);
 						out.put("redUserName", tempGS.redUserName);
 						out.put("blackUserName", tempGS.blackUserName);
@@ -160,8 +165,35 @@ public class Server {
 						
 						System.out.printf("Game %d started\n", gameID);
 					}
+				} else if(opcode == SERVER_LIST_REQUEST) {
+					out.put("Opcode", SERVER_LIST_REQUEST);
+					
+					System.out.printf("am here");
+					
+					// return a list of games awaiting players
+					for(Map.Entry<Integer, Game> game : games.entrySet()) {
+						
+						printer = new PrintWriter(socket.getOutputStream(), true);
+						
+						tempGS = game.getValue().getGameState();
+						
+						if(tempGS.blackPlayer == null) {
+							out.put("GameID", tempGS.gameID);
+							out.put("Player1", tempGS.redUserName);
+							out.put("Done", "false");
+							
+							printer.println(out.toJSONString());
+						}
+					}
+					
+					out.put("GameID", "null");
+					out.put("Player1", null);
+					out.put("Done", "true");
+					
+					printer.println(out.toJSONString());
 				}
 					
+				out.clear();
 				socket.close();
 			}
 			

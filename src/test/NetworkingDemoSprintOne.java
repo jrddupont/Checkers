@@ -51,5 +51,12 @@ public class NetworkingDemoSprintOne {
 		charles.processPacket(charles.getMail());
 		david.processPacket(david.getMail());		
 		
+		out.put("GameID", 7327);
+		out.put("Username", "eli");
+		ClientPlayer eli = new ClientPlayer();
+		eli.sendPacket(out);
+		
+		eli.processPacket(eli.getMail());
+		
 	}
 }
