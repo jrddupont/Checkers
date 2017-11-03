@@ -111,6 +111,11 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 	// XXX will be moved to another helper class at a later date
 	// this turned out much uglier than intended
 	
+	// XXX feel free to reformat the returned string.
+	// if more/different information is wanted it can be changed
+	
+	// XXX client player will be refactored to be easy to call and join a game.
+	
 	/*
 	 * Talks to server, receives list of games that are waiting
 	 * for a second player.
