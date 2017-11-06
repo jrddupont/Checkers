@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 import util.Board;
 import util.GameState;
 import util.NetworkedPlayer;
+import util.Netwrk;
 
 public class ClientPlayer extends NetworkedPlayer{
 	
@@ -25,16 +26,17 @@ public class ClientPlayer extends NetworkedPlayer{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void processPacket(JSONObject json) {
-		switch(((Long) json.get("Opcode")).byteValue())
+		switch(((Long) json.get(Netwrk.OPCODE)).byteValue())
 		{
-		case HELLO:			
-			if(((Long) json.get("Port")).intValue() > 0)
+		case Netwrk.HELLO:			
+			if(((Long) json.get(Netwrk.PORT)).intValue() > 0)
 			{
 				try {
 					socket.close();
-					port = ((Long) json.get("Port")).intValue();
+					port = ((Long) json.get(Netwrk.PORT)).intValue();
 					
 					socket = new Socket(serverIP, port);
 				} catch (IOException e) {
@@ -44,32 +46,32 @@ public class ClientPlayer extends NetworkedPlayer{
 			}
 			else System.out.printf("Tried to join a full game\n");
 			break;
-		case GAME_START:
-			game.redUserName = json.get("redUserName").toString();
-			game.blackUserName = json.get("blackUserName").toString();
-			game.redWins = ((Long) json.get("redWins")).intValue();
-			game.blackWins = ((Long) json.get("blackWins")).intValue();
-			game.redLosses = ((Long) json.get("redLosses")).intValue();
-			game.blackLosses = ((Long) json.get("blackLosses")).intValue();
-			game.redTies = ((Long) json.get("redTies")).intValue();
-			game.blackTies = ((Long) json.get("blackTies")).intValue();
-			game.gameID = ((Long) json.get("gameID")).intValue();
-			game.board.board[0] = ((Long) json.get("Red")).intValue();
-			game.board.board[1] = ((Long) json.get("Black")).intValue();
-			game.board.board[2] = ((Long) json.get("King")).intValue();
+		case Netwrk.GAME_START:
+			game.playerOneUserName = json.get(Netwrk.PLAYER_ONE_UNAME).toString();
+			game.playerTwoUserName = json.get(Netwrk.PLAYER_TWO_UNAME).toString();
+			game.playerOneWins = ((Long) json.get(Netwrk.PLAYER_ONE_WINS)).intValue();
+			game.playerTwoWins = ((Long) json.get(Netwrk.PLAYER_TWO_WINS)).intValue();
+			game.playerOneLosses = ((Long) json.get(Netwrk.PLAYER_ONE_LOSSES)).intValue();
+			game.playerTwoLosses = ((Long) json.get(Netwrk.PLAYER_TWO_LOSSES)).intValue();
+			game.playerOneTies = ((Long) json.get(Netwrk.PLAYER_ONE_TIES)).intValue();
+			game.playerTwoTies = ((Long) json.get(Netwrk.PLAYER_TWO_TIES)).intValue();
+			game.gameID = ((Long) json.get(Netwrk.GAME_ID)).intValue();
+			game.board.board[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			game.board.board[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			game.board.board[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
 			System.out.printf("Joined game %d\n", game.gameID);
 			System.out.println("Game started!");
 			break;
-		case MOVE_REQUEST:
-			game.board = (Board) json.get("data");
+		case Netwrk.MOVE_REQUEST:
+			game.board = (Board) json.get(Netwrk.GAME_BOARD);
 			//indicate player turn
 			//wait for player to make move
 			
 			JSONObject out = new JSONObject();
-			out.put("Opcode", MOVE_REQUEST);
-			out.put("Red", game.board.board[0]);
-			out.put("Black", game.board.board[1]);
-			out.put("King", game.board.board[2]);
+			out.put(Netwrk.OPCODE, Netwrk.MOVE_REQUEST);
+			out.put(Netwrk.PLAYER_ONE_BOARD, game.board.board[0]);
+			out.put(Netwrk.PLAYER_TWO_BOARD, game.board.board[1]);
+			out.put(Netwrk.KINGS_BOARD, game.board.board[2]);
 			sendPacket(out);
 			break;
 		}

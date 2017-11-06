@@ -10,6 +10,7 @@ import client.*;
 public class NetworkingDemoSprintOne {
 	final protected static byte HELLO = 0;
 	
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		ClientPlayer alice = new ClientPlayer();
 		ClientPlayer bob = new ClientPlayer();
@@ -17,16 +18,16 @@ public class NetworkingDemoSprintOne {
 		
 		
 		JSONObject out = new JSONObject();
-		out.put("Opcode", HELLO);
-		out.put("GameID", 3);
+		out.put(Netwrk.OPCODE, HELLO);
+		out.put(Netwrk.GAME_ID, 3);
 		
-		out.put("Username", "alice");
+		out.put(Netwrk.USER_NAME, "alice");
 		alice.sendPacket(out);
 		
-		out.put("Username", "bob");
+		out.put(Netwrk.USER_NAME, "bob");
 		bob.sendPacket(out);
 		
-		out.put("Username", "charles");
+		out.put(Netwrk.USER_NAME, "charles");
 		charles.sendPacket(out);
 		
 		alice.processPacket(alice.getMail());
@@ -37,11 +38,11 @@ public class NetworkingDemoSprintOne {
 		alice.processPacket(alice.getMail());
 		bob.processPacket(bob.getMail());	
 		
-		out.put("GameID", 7);
+		out.put(Netwrk.GAME_ID, 7);
 		charles = new ClientPlayer();
 		charles.sendPacket(out);
 		
-		out.put("Username", "david");
+		out.put(Netwrk.USER_NAME, "david");
 		ClientPlayer david = new ClientPlayer();
 		david.sendPacket(out);
 		
@@ -50,6 +51,13 @@ public class NetworkingDemoSprintOne {
 		
 		charles.processPacket(charles.getMail());
 		david.processPacket(david.getMail());		
+		
+		out.put(Netwrk.GAME_ID, 7327);
+		out.put(Netwrk.USER_NAME, "eli");
+		ClientPlayer eli = new ClientPlayer();
+		eli.sendPacket(out);
+		
+		eli.processPacket(eli.getMail());
 		
 	}
 }

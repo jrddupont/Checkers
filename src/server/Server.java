@@ -18,23 +18,18 @@ import org.json.simple.parser.ParseException;
 import util.Game;
 import util.GameState;
 import util.NetworkedPlayer;
+import util.Netwrk;
 
 public class Server {
 	
-	final private byte HELLO = 0;
-	final private byte EXIT = 1;
-	final private byte AUNTENTICATE = 2;
-	final private byte GAME_START = 3;
-	final private byte GAME_END = 4;
-	final private byte REMATCH_REQUEST = 5;
-	final private byte MOVE_REQUEST = 6;
+	private ServerSocket ssocket;
+	private Socket socket;
+	private BufferedReader buffReader;
+	private PrintWriter printer;
 	
-	ServerSocket ssocket;
-	Socket socket;
-	BufferedReader buffReader;
-	PrintWriter printer;
+	private Map<Integer, Game> games = new TreeMap<Integer, Game>();
 	
-	Map<Integer, Game> games = new TreeMap<Integer, Game>();
+	final private JSONObject out = new JSONObject();
 	
 	/*
 	 * Sever starts and waits for new players that want to join or make a game. 
@@ -53,6 +48,8 @@ public class Server {
 		ServerPlayer tempPlayer;
 		String playerName;
 		int gamePort = 0;
+		
+		
 		
 		
 		try {
@@ -74,33 +71,33 @@ public class Server {
 				
 				
 				// do stupid check
-				opcode = ((Long)data.get("Opcode")).byteValue();
+				opcode = ((Long)data.get(Netwrk.OPCODE)).byteValue();
 				
-				if(opcode == HELLO) {
+				if(opcode == Netwrk.HELLO) {
 					// validate from DB
-					playerName = (String)data.get("Username");
+					playerName = (String)data.get(Netwrk.USER_NAME);
 					
 					// get info from DB
 					
-					int gameID = ((Long)data.get("GameID")).intValue();
+					int gameID = ((Long)data.get(Netwrk.GAME_ID)).intValue();
 					
 					// the player wants to join an existing game
 					if(games.containsKey(gameID)) {						
 						// if that game is waiting for a player
-						if((tempGame = games.get(gameID)).getGameState().blackPlayer == null) {
+						if((tempGame = games.get(gameID)).getGameState().PlayerTwo == null) {
 							tempPlayer = new ServerPlayer();
 							
 							gamePort = tempPlayer.getServerPort();
 							new Thread(tempPlayer).start();							
 							
-							tempGame.getGameState().blackPlayer = tempPlayer;
-							tempGame.getGameState().blackUserName = playerName;
+							tempGame.getGameState().PlayerTwo = tempPlayer;
+							tempGame.getGameState().playerTwoUserName = playerName;
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
 							// reply with an error code in the port
-							data.put("Opcode", HELLO);
-							data.put("Port", -1);
+							data.put(Netwrk.USER_NAME, Netwrk.HELLO);
+							data.put(Netwrk.PORT, -1);
 							
 							printer = new PrintWriter(socket.getOutputStream(), true);
 							
@@ -113,7 +110,7 @@ public class Server {
 					  // the player wants to make a new game						
 						tempGS = new GameState();
 						tempGS.gameID = gameID;
-						tempGS.redUserName = playerName;
+						tempGS.playerOneUserName = playerName;
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
@@ -121,47 +118,70 @@ public class Server {
 						new Thread(tempPlayer).start();
 						
 						
-						tempGS.redPlayer = tempPlayer;
+						tempGS.PlayerOne = tempPlayer;
 						
 						games.put(gameID, new Game(tempGS));
 						System.out.printf("%s joined vacant game %d\n", playerName, gameID);
 					}
 					
-					JSONObject out = new JSONObject();
 					
-					out.put("Opcode", HELLO);
-					out.put("Port", gamePort);
+					
+					out.put(Netwrk.OPCODE, Netwrk.HELLO);
+					out.put(Netwrk.PORT, gamePort);
 					
 					printer = new PrintWriter(socket.getOutputStream(), true);
 					
 					printer.println(out.toJSONString());
 					
-					if(games.get(gameID).getGameState().blackPlayer != null)
+					if(games.get(gameID).getGameState().PlayerTwo != null)
 					{
 						tempGS = games.get(gameID).getGameState();
-						out = new JSONObject();
-						out.put("Opcode", GAME_START);
-						out.put("redUserName", tempGS.redUserName);
-						out.put("blackUserName", tempGS.blackUserName);
-						out.put("redWins", tempGS.redWins);
-						out.put("blackWins", tempGS.blackWins);
-						out.put("redLosses", tempGS.redLosses);
-						out.put("blackLosses", tempGS.blackLosses);
-						out.put("redTies", tempGS.redTies);
-						out.put("blackTies", tempGS.blackTies);
-						out.put("gameID", tempGS.gameID);
-						out.put("Red", tempGS.board.board[0]);
-						out.put("Black", tempGS.board.board[1]);
-						out.put("King", tempGS.board.board[2]);
+						out.clear();
+						out.put(Netwrk.OPCODE, Netwrk.GAME_START);
+						out.put(Netwrk.PLAYER_ONE_UNAME, tempGS.playerOneUserName);
+						out.put(Netwrk.PLAYER_TWO_UNAME, tempGS.playerTwoUserName);
+						out.put(Netwrk.PLAYER_ONE_WINS, tempGS.playerOneWins);
+						out.put(Netwrk.PLAYER_TWO_WINS, tempGS.playerTwoWins);
+						out.put(Netwrk.PLAYER_ONE_LOSSES, tempGS.playerOneLosses);
+						out.put(Netwrk.PLAYER_TWO_LOSSES, tempGS.playerTwoLosses);
+						out.put(Netwrk.PLAYER_ONE_TIES, tempGS.playerOneTies);
+						out.put(Netwrk.PLAYER_TWO_TIES, tempGS.playerTwoTies);
+						out.put(Netwrk.GAME_ID, tempGS.gameID);
+						out.put(Netwrk.PLAYER_ONE_BOARD, tempGS.board.board[0]);
+						out.put(Netwrk.PLAYER_TWO_BOARD, tempGS.board.board[1]);
+						out.put(Netwrk.KINGS_BOARD, tempGS.board.board[2]);
 						
-						((NetworkedPlayer) games.get(gameID).getGameState().redPlayer).sendPacket(out); 
-						((NetworkedPlayer) games.get(gameID).getGameState().blackPlayer).sendPacket(out);
+						((NetworkedPlayer) games.get(gameID).getGameState().PlayerOne).sendPacket(out); 
+						((NetworkedPlayer) games.get(gameID).getGameState().PlayerTwo).sendPacket(out);
 						//games.get(gameID).startGame(); //Evan pls
 						
 						System.out.printf("Game %d started\n", gameID);
 					}
+				} else if(opcode == Netwrk.SERVER_LIST_REQUEST) {
+					out.put(Netwrk.OPCODE, Netwrk.SERVER_LIST_REQUEST);
+					
+					// return a list of games awaiting players
+					for(Map.Entry<Integer, Game> game : games.entrySet()) {
+						
+						printer = new PrintWriter(socket.getOutputStream(), true);
+						
+						tempGS = game.getValue().getGameState();
+						
+						if(tempGS.PlayerTwo == null) {
+							out.put(Netwrk.GAME_ID, tempGS.gameID);
+							out.put(Netwrk.PLAYER_ONE_UNAME, tempGS.playerOneUserName);
+							
+							printer.println(out.toJSONString());
+						}
+					}
+					
+					out.put(Netwrk.GAME_ID, "null");
+					out.put(Netwrk.PLAYER_ONE_UNAME, "null");
+					
+					printer.println(out.toJSONString());
 				}
 					
+				out.clear();
 				socket.close();
 			}
 			
