@@ -1,14 +1,18 @@
 package gui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
-import client.Driver;
+import util.Board;
 import util.Settings;
+import client.Driver;
 
 
 
@@ -37,14 +41,16 @@ public class GamePanel extends AbstractMenuPanel{
 		public static final byte MASK_P2 = 1;
 		public static final byte MASK_KING = 2;
 		
-		int[] gameState;
-		public GameBoardUI(){
-			gameState = new int[3];
-		}
+		public boolean hasPossibleMoves = false;
+		public int possibleMoves = 0; 
 		
-		public void setGameState(int[] gameState) {
-			this.gameState = gameState;
-			repaint();
+		Board board;
+		public GameBoardUI(){
+			board = new Board();
+			BoardMouseListener bml = new BoardMouseListener();
+			addMouseListener(bml);
+			addMouseMotionListener(bml);
+			requestFocus();
 		}
 		
 		@Override
@@ -74,17 +80,23 @@ public class GamePanel extends AbstractMenuPanel{
 						int x = i % 2 == 0 ? i/2 : (i-1)/2;
 						int curPos = toNum(x, j);
 						
-						if(getBit(gameState[MASK_P1], curPos) == 1){
+						if(getBit(board.board[MASK_P1], curPos) == 1){
 							g.setColor(Settings.currentTheme.player1Color);
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
-						}else if(getBit(gameState[MASK_P2], curPos) == 1){
+						}else if(getBit(board.board[MASK_P2], curPos) == 1){
 							g.setColor(Settings.currentTheme.player2Color);
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
 						}
-						if(getBit(gameState[MASK_KING], curPos) == 1){
+						if(getBit(board.board[MASK_KING], curPos) == 1){
 							g.setColor(Settings.currentTheme.kingColor);
 							g.fillOval(i*cellSize + cellSize/4, j*cellSize + cellSize/4, cellSize/2, cellSize/2);
 						}
+						if(hasPossibleMoves && getBit(possibleMoves, curPos) == 1){
+							g.setColor(Settings.currentTheme.darkBoardColor.brighter());
+							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
+						}
+						g.setColor(Color.WHITE);
+						g.drawString(curPos+"", i*cellSize + cellSize / 2, j*cellSize + cellSize / 2);
 					}
 				}
 			}
@@ -94,6 +106,52 @@ public class GamePanel extends AbstractMenuPanel{
 		}
 		int getBit(int mask, int position){
 			return (mask >> position) & 1;
+		}
+		
+		class BoardMouseListener extends MouseAdapter {
+			@Override 
+			public void mouseClicked(MouseEvent e) {
+				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
+				if(e.getButton() == MouseEvent.BUTTON1){
+					int x = e.getX();
+					int y = e.getY();
+				}
+			}
+			@Override 
+			public void mouseMoved(MouseEvent e) {
+				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
+				int x = e.getX();
+				int y = e.getY();
+				
+				int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
+				if(position == -1){
+					boardGUI.hasPossibleMoves = false;
+					boardGUI.repaint();
+				}else{
+					boardGUI.hasPossibleMoves = true;
+					boardGUI.possibleMoves = board.getMoves(Board.PLAYER_1, position) | board.getMoves(Board.PLAYER_2, position);
+					boardGUI.repaint();
+				}
+				
+			}
+			
+			private int getPosition(int x, int y, int size){
+				int smallX = x / (size/8);
+				int smallY = y / (size/8);
+				if(smallY % 2 == 0){
+					if((smallX - 1) % 2 == 0){
+						return (smallY * 4) + ((smallX - 1) / 2);
+					}else{
+						return -1;
+					}
+				}else{
+					if(smallX % 2 == 0){
+						return (smallY * 4) + (smallX  / 2);
+					}else{
+						return -1;
+					}
+				}
+			}
 		}
 	}
 }
