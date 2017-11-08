@@ -10,11 +10,11 @@ public class Board {
 	public static final int START_1 = 0b00000000000000000000111111111111; //starting board for first player
 	public static final int START_2 = 0b11111111111100000000000000000000; //starting board for second player
 	
-	int mask3Neg5 	= 0b00001110000011100000111000001110; //3, -5
-	int mask5Neg3 	= 0b01110000011100000111000001110000; //5, -3
+	int mask3Neg5 	= 0b11100000111000001110000011100000; //3, -5
+	int mask5Neg3 	= 0b00000111000001110000011100000111; //5, -3
 	
 	
-	public int[] board = new int[3];
+	private int[] board = new int[3];
 
 	public Board() {
 		System.out.println("Initializing board:\n");
@@ -50,7 +50,7 @@ public class Board {
 		
 		if (player == PLAYER_1) { 
 			dir = 1; //player 1 moves in a positive direction
-		} else { 
+		} else {
 			dir = -1; //player 2 moves in a negative direction
 		}
 		
