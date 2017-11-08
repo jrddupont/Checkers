@@ -14,7 +14,7 @@ public class Board {
 	int mask5Neg3 	= 0b00000111000001110000011100000111; //5, -3
 	
 	
-	private int[] board = new int[3];
+	public int[] board = new int[3];
 
 	public Board() {
 		System.out.println("Initializing board:\n");
