@@ -40,9 +40,9 @@ public class Board {
 	public int getMoves(int player, int pieceIndex) {
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;
-		return (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*(4 - dir)) & mask3Neg5)
-				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*(4 + dir)) & mask5Neg3) 
-				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*(4)));
+		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
 	}
 	
 	public ArrayList<Integer> getForwardMoves(int player) {
@@ -54,11 +54,14 @@ public class Board {
 			dir = -1; //player 2 moves in a negative direction
 		}
 		
-		int plus3Minus5 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], dir*(4 - dir)) & mask3Neg5); 
+		int plus3Minus5 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask3Neg5, dir*(4 - dir)));
+		System.out.println((4-dir)*dir);
 		shittyPrint(plus3Minus5);
-		int plus5Minus3 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], dir*(4 + dir)) & mask5Neg3);
+		int plus5Minus3 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask5Neg3, dir*(4 + dir)));
+		System.out.println((4+dir)*dir);
 		shittyPrint(plus5Minus3);
-		int plus4Minus4 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], 4*dir));
+		int plus4Minus4 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], dir*4));
+		System.out.println(4*dir);
 		shittyPrint(plus4Minus4);
 		
 		return null;
