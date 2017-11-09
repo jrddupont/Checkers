@@ -141,6 +141,9 @@ public class GamePanel extends AbstractMenuPanel{
 			}
 			
 			private int getPosition(int x, int y, int size){
+				if(x > size || y > size || x < 0 || y < 0){
+					return -1;
+				}
 				int smallX = x / (size/8);
 				int smallY = y / (size/8);
 				if(smallY % 2 == 0){
