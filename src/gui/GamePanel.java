@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Random;
 
 import javax.swing.JButton;
@@ -59,11 +60,13 @@ public class GamePanel extends AbstractMenuPanel{
 		private boolean hasDesiredMoves = false;
 		private int possibleMoves = 0;
 		private int desiredMoves = 0;
+		private int moveFrom;
 		
 		private boolean waitingForMove = false; 
 		private HumanPlayer callbackPlayer = null;
 		
 		GameState gameState;
+		
 		public GameBoardUI(GameState gs){
 			gameState = gs;
 			Random r = new Random();
@@ -134,9 +137,11 @@ public class GamePanel extends AbstractMenuPanel{
 			}
 		}
 		
-		public void flagForMove(HumanPlayer player) {
+		public void flagForMove(HumanPlayer player, Board b) {
 			waitingForMove = true;
 			callbackPlayer = player;
+			gameState.board = b;
+			repaint();
 		}
 		
 		private void makeMove(Board b){
@@ -161,16 +166,22 @@ public class GamePanel extends AbstractMenuPanel{
 				if(e.getButton() == MouseEvent.BUTTON1){
 					int x = e.getX();
 					int y = e.getY();
-					
 					int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
+					
+					if(waitingForMove && hasDesiredMoves){
+						if(((1 << position) & desiredMoves) > 0){
+							gameState.board.board = movePiece(gameState.board.board, boardGUI.moveFrom, position);
+							makeMove(gameState.board);
+						}
+					}
 					if(position == -1){
 						boardGUI.hasDesiredMoves = false;
-						boardGUI.repaint();
 					}else{
 						boardGUI.hasDesiredMoves = true;
 						boardGUI.desiredMoves = gameState.board.getMoves(Board.PLAYER_1, position) | gameState.board.getMoves(Board.PLAYER_2, position);
-						boardGUI.repaint();
+						boardGUI.moveFrom = position;
 					}
+					boardGUI.repaint();
 				}
 			}
 			@Override 
@@ -180,6 +191,7 @@ public class GamePanel extends AbstractMenuPanel{
 				int y = e.getY();
 				
 				int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
+				
 				if(position == -1){
 					boardGUI.hasPossibleMoves = false;
 					boardGUI.repaint();
@@ -189,6 +201,19 @@ public class GamePanel extends AbstractMenuPanel{
 					boardGUI.repaint();
 				}
 				
+			}
+			
+			private int[] movePiece(int[] boardInts, int from, int to){	// Does NOT validate move
+				for(int i = 0; i < boardInts.length; i++){
+					if(getBit(boardInts[i], from) != getBit(boardInts[i], to)){
+						boardInts[i] = toggleBit(boardInts[i], from);
+						boardInts[i] = toggleBit(boardInts[i], to);
+					}
+				}
+				return boardInts;
+			}
+			private int toggleBit(int mask, int position){
+				return mask ^ (1 << position);
 			}
 			
 			private int getPosition(int x, int y, int size){

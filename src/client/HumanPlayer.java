@@ -6,6 +6,7 @@ import util.Board;
 public class HumanPlayer extends LocalPlayer{
 	GameBoardUI gameBoardUI;
 	Board returnBoard;
+	private final Object lock = new Object();
 	
 	public HumanPlayer(GameBoardUI ui){
 		gameBoardUI = ui;
@@ -13,9 +14,17 @@ public class HumanPlayer extends LocalPlayer{
 	
 	@Override
 	public Board getMove(Board board) {		
-		gameBoardUI.flagForMove(this);
+		gameBoardUI.flagForMove(this, board);
 		while(true){
-			try { wait(); } catch (InterruptedException e) { }
+			
+			try {
+				synchronized(lock) {
+					lock.wait();	
+				}
+			} catch (InterruptedException e) { 
+				e.printStackTrace();
+			}
+			
 			if(returnBoard != null){
 				Board retBrd = returnBoard;
 				returnBoard = null;
@@ -26,6 +35,8 @@ public class HumanPlayer extends LocalPlayer{
 	
 	public void callback(Board returnBoard){
 		this.returnBoard = returnBoard;
-		notifyAll();
+		synchronized(lock) {
+			lock.notifyAll();	
+		}
 	}
 }
