@@ -1,7 +1,9 @@
 package gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -12,8 +14,13 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import util.Board;
+import util.Game;
+import util.GameState;
+import util.Player;
 import util.Settings;
 import client.Driver;
+import client.DumbAIPlayer;
+import client.HumanPlayer;
 
 
 
@@ -21,11 +28,21 @@ import client.Driver;
 public class GamePanel extends AbstractMenuPanel{
 	
 	public GameBoardUI gameBoard;
+	public Player player1;
+	public Player player2;
+	public GameState gameState = new GameState();
 	
 	public GamePanel(){
 		super();
+		gameBoard = new GameBoardUI(gameState);
+		
+		player1 = new HumanPlayer(gameBoard);
+		player2 = new DumbAIPlayer(Board.PLAYER_2);
+		gameState.PlayerOne = player1;
+		gameState.PlayerTwo = player2;
+		
 		JButton mainMenuButton = new JButton("Main menu");
-		add(new GameBoardUI());
+		add(gameBoard);
 		add(mainMenuButton);
 		
 		mainMenuButton.addActionListener(new ActionListener() {
@@ -38,19 +55,21 @@ public class GamePanel extends AbstractMenuPanel{
 	
 	public class GameBoardUI extends JComponent{
 		
-		public static final byte MASK_P1 = 0;
-		public static final byte MASK_P2 = 1;
-		public static final byte MASK_KING = 2;
+		private boolean hasPossibleMoves = false;
+		private boolean hasDesiredMoves = false;
+		private int possibleMoves = 0;
+		private int desiredMoves = 0;
 		
-		public boolean hasPossibleMoves = false;
-		public int possibleMoves = 0; 
+		private boolean waitingForMove = false; 
+		private HumanPlayer callbackPlayer = null;
 		
-		Board board;
-		public GameBoardUI(){
+		GameState gameState;
+		public GameBoardUI(GameState gs){
+			gameState = gs;
 			Random r = new Random();
-			board = new Board();
-			board.board[0] = r.nextInt() >>> 16;
-			board.board[1] = r.nextInt() << 16;
+			gameState.board = new Board();
+			gameState.board.board[0] = r.nextInt() >>> 16;
+			gameState.board.board[1] = r.nextInt() << 16;
 			
 			BoardMouseListener bml = new BoardMouseListener();
 			addMouseListener(bml);
@@ -84,15 +103,16 @@ public class GamePanel extends AbstractMenuPanel{
 					if(inFill){
 						int x = i % 2 == 0 ? i/2 : (i-1)/2;
 						int curPos = toNum(x, j);
+						int[] gameBoard = gameState.board.board; 
 						
-						if(getBit(board.board[MASK_P1], curPos) == 1){
+						if(getBit(gameBoard[Board.PLAYER_1], curPos) == 1){
 							g.setColor(Settings.currentTheme.player1Color);
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
-						}else if(getBit(board.board[MASK_P2], curPos) == 1){
+						}else if(getBit(gameBoard[Board.PLAYER_2], curPos) == 1){
 							g.setColor(Settings.currentTheme.player2Color);
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
 						}
-						if(getBit(board.board[MASK_KING], curPos) == 1){
+						if(getBit(gameBoard[Board.KING], curPos) == 1){
 							g.setColor(Settings.currentTheme.kingColor);
 							g.fillOval(i*cellSize + cellSize/4, j*cellSize + cellSize/4, cellSize/2, cellSize/2);
 						}
@@ -100,12 +120,33 @@ public class GamePanel extends AbstractMenuPanel{
 							g.setColor(Settings.currentTheme.darkBoardColor.brighter());
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
 						}
+						if(hasDesiredMoves && getBit(desiredMoves, curPos) == 1){
+							g.setColor(Color.GREEN);
+							Graphics2D g2 = (Graphics2D) g;
+							int strokeSize = 5;
+			                g2.setStroke(new BasicStroke(strokeSize));
+							g2.drawOval(i*cellSize + strokeSize/2, j*cellSize + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+						}
 						g.setColor(Color.WHITE);
 						g.drawString(curPos+"", i*cellSize + cellSize / 2, j*cellSize + cellSize / 2);
 					}
 				}
 			}
 		}
+		
+		public void flagForMove(HumanPlayer player) {
+			waitingForMove = true;
+			callbackPlayer = player;
+		}
+		
+		private void makeMove(Board b){
+			if(waitingForMove){
+				callbackPlayer.callback(b);
+			}
+			waitingForMove = false;
+			callbackPlayer = null;
+		}
+		
 		private int toNum(int x, int y){
 			return (y*4) + x;
 		}
@@ -120,6 +161,16 @@ public class GamePanel extends AbstractMenuPanel{
 				if(e.getButton() == MouseEvent.BUTTON1){
 					int x = e.getX();
 					int y = e.getY();
+					
+					int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
+					if(position == -1){
+						boardGUI.hasDesiredMoves = false;
+						boardGUI.repaint();
+					}else{
+						boardGUI.hasDesiredMoves = true;
+						boardGUI.desiredMoves = gameState.board.getMoves(Board.PLAYER_1, position) | gameState.board.getMoves(Board.PLAYER_2, position);
+						boardGUI.repaint();
+					}
 				}
 			}
 			@Override 
@@ -134,7 +185,7 @@ public class GamePanel extends AbstractMenuPanel{
 					boardGUI.repaint();
 				}else{
 					boardGUI.hasPossibleMoves = true;
-					boardGUI.possibleMoves = board.getMoves(Board.PLAYER_1, position) | board.getMoves(Board.PLAYER_2, position);
+					boardGUI.possibleMoves = gameState.board.getMoves(Board.PLAYER_1, position) | gameState.board.getMoves(Board.PLAYER_2, position);
 					boardGUI.repaint();
 				}
 				
@@ -161,5 +212,6 @@ public class GamePanel extends AbstractMenuPanel{
 				}
 			}
 		}
+		
 	}
 }

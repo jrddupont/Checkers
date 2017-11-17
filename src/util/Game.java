@@ -15,7 +15,7 @@ public class Game {
 		while(true){
 			ArrayList<Board> possibleMoves = gs.board.getNextStates(turn);
 			Board move = players[turn].getMove(gs.board);
-			if(possibleMoves.contains(move) || true){ // TODO this will not work
+			if(possibleMoves.contains(move) || true){ // TODO this will not work, it's looking for objects
 				gs.board = move;
 				System.out.println(move.toString());
 				turn = turn == 0 ? 1 : 0;
