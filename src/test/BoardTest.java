@@ -12,5 +12,7 @@ public class BoardTest {
 		System.out.println("XXXXX");
 		Board.shittyPrint(b.getMoves(Board.PLAYER_1, 10));
 		System.out.println("----");
+		
+		System.out.println(b.getForwardMoves(Board.PLAYER_2));
 	}
 }

@@ -29,7 +29,7 @@ public class Board {
 		board[KING] = 0;
 	}
 	
-	private int shift(int b, int offset) {
+	private static int shift(int b, int offset) {
 		if(offset < 0) {
 			return b >>> -offset;
 		} else {
@@ -46,6 +46,7 @@ public class Board {
 	}
 	
 	public ArrayList<Integer> getForwardMoves(int player) {
+		ArrayList<Integer> boardList = new ArrayList<>(20);
 		int dir; //direction the pieces move to go forward
 		
 		if (player == PLAYER_1) { 
@@ -56,15 +57,31 @@ public class Board {
 		
 		int plus3Minus5 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask3Neg5, dir*(4 - dir)));
 		System.out.println((4-dir)*dir);
+		addForwardMoves(boardList, board[player], plus3Minus5, (4-dir)*dir);
 		shittyPrint(plus3Minus5);
 		int plus5Minus3 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask5Neg3, dir*(4 + dir)));
 		System.out.println((4+dir)*dir);
+		addForwardMoves(boardList, board[player], plus5Minus3, (4+dir)*dir);
 		shittyPrint(plus5Minus3);
 		int plus4Minus4 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], dir*4));
 		System.out.println(4*dir);
+		addForwardMoves(boardList, board[player], plus4Minus4, dir*4);
 		shittyPrint(plus4Minus4);
 		
-		return null;
+		return boardList;
+	}
+	
+	private static void addForwardMoves(ArrayList<Integer> boardList, int board, int moves, int moveOffset) {
+		int x = Integer.lowestOneBit(moves);
+		while(x != 0) {
+			System.out.println("LOG:" + Math.log(x)/Math.log(2));
+			boardList.add(x | board & ~(shift(x, -moveOffset)));
+			moves &= ~x;
+			System.out.println("offset: "+moveOffset);
+			shittyPrint(x | board & ~(shift(x, -moveOffset)));
+			x = Integer.lowestOneBit(moves);
+		}
+		
 	}
 	
 	public static void shittyPrint(int b) {
