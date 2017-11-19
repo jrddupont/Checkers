@@ -1,13 +1,8 @@
 package client;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import util.Board;
 import util.GameState;
@@ -56,9 +51,9 @@ public class ClientPlayer extends NetworkedPlayer{
 			game.playerOneTies = ((Long) json.get(Netwrk.PLAYER_ONE_TIES)).intValue();
 			game.playerTwoTies = ((Long) json.get(Netwrk.PLAYER_TWO_TIES)).intValue();
 			game.gameID = ((Long) json.get(Netwrk.GAME_ID)).intValue();
-			game.board.board[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
-			game.board.board[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
-			game.board.board[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
+			game.board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			game.board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			game.board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
 			System.out.printf("Joined game %d\n", game.gameID);
 			System.out.println("Game started!");
 			break;
@@ -69,9 +64,9 @@ public class ClientPlayer extends NetworkedPlayer{
 			
 			JSONObject out = new JSONObject();
 			out.put(Netwrk.OPCODE, Netwrk.MOVE_REQUEST);
-			out.put(Netwrk.PLAYER_ONE_BOARD, game.board.board[0]);
-			out.put(Netwrk.PLAYER_TWO_BOARD, game.board.board[1]);
-			out.put(Netwrk.KINGS_BOARD, game.board.board[2]);
+			out.put(Netwrk.PLAYER_ONE_BOARD, game.board.getBoard()[0]);
+			out.put(Netwrk.PLAYER_TWO_BOARD, game.board.getBoard()[1]);
+			out.put(Netwrk.KINGS_BOARD, game.board.getBoard()[2]);
 			sendPacket(out);
 			break;
 		}

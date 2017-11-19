@@ -56,14 +56,12 @@ public class GamePanel extends AbstractMenuPanel{
 	
 	public class GameBoardUI extends JComponent{
 		
-		private boolean hasPossibleMoves = false;
-		private boolean hasDesiredMoves = false;
-		private int possibleMoves = 0;
-		private int desiredMoves = 0;
-		private int moveFrom;
+		private boolean hasDesiredMoves = false;	// If the player clicked on a piece that has moves
+		private int desiredMoves = 0;	// Mask of possible moves of the currently clicked piece
+		private boolean isJumping = false; // In a state of jumping, IE has jumped and needs to jump again
 		
-		private boolean waitingForMove = false; 
-		private HumanPlayer callbackPlayer = null;
+		private boolean waitingForMove = false; // If we should listen for moves
+		private HumanPlayer playerToNotify = null;	// What player to notify of changes
 		
 		GameState gameState;
 		
@@ -71,8 +69,8 @@ public class GamePanel extends AbstractMenuPanel{
 			gameState = gs;
 			Random r = new Random();
 			gameState.board = new Board();
-			gameState.board.board[0] = r.nextInt() >>> 16;
-			gameState.board.board[1] = r.nextInt() << 16;
+			gameState.board.getBoard()[0] = r.nextInt() >>> 16;
+			gameState.board.getBoard()[1] = r.nextInt() << 16;
 			
 			BoardMouseListener bml = new BoardMouseListener();
 			addMouseListener(bml);
@@ -106,71 +104,76 @@ public class GamePanel extends AbstractMenuPanel{
 					if(inFill){
 						int x = i % 2 == 0 ? i/2 : (i-1)/2;
 						int curPos = toNum(x, j);
-						int[] gameBoard = gameState.board.board; 
 						
-						if(getBit(gameBoard[Board.PLAYER_1], curPos) == 1){
+						int currentDrawX = i*cellSize;
+						int currentDrawY = j*cellSize;
+						
+						if(gameState.board.hasPlayerAt(Board.PLAYER_1, curPos)){	// If the current position has a player 1 piece
 							g.setColor(Settings.currentTheme.player1Color);
-							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
-						}else if(getBit(gameBoard[Board.PLAYER_2], curPos) == 1){
+						}else if(gameState.board.hasPlayerAt(Board.PLAYER_2, curPos)){	// If the current position has a player 2 piece
 							g.setColor(Settings.currentTheme.player2Color);
-							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
 						}
-						if(getBit(gameBoard[Board.KINGS], curPos) == 1){
+						if(getBit( gameState.board.getMoveMask(player), curPos)){
+							
+						}
+						g.fillOval(currentDrawX, currentDrawY, cellSize, cellSize);
+						
+						if(gameState.board.hasKingAt(curPos)){	// If the current position has a king piece
 							g.setColor(Settings.currentTheme.kingColor);
-							g.fillOval(i*cellSize + cellSize/4, j*cellSize + cellSize/4, cellSize/2, cellSize/2);
+							g.fillOval(currentDrawX + cellSize/4, currentDrawY + cellSize/4, cellSize/2, cellSize/2);
 						}
-						if(hasPossibleMoves && getBit(possibleMoves, curPos) == 1){
-							g.setColor(Settings.currentTheme.darkBoardColor.brighter());
-							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
-						}
-						if(hasDesiredMoves && getBit(desiredMoves, curPos) == 1){
+						if(hasDesiredMoves && getBit(desiredMoves, curPos) == 1){	// If the current position has a desired move
 							g.setColor(Color.GREEN);
 							Graphics2D g2 = (Graphics2D) g;
 							int strokeSize = 5;
 			                g2.setStroke(new BasicStroke(strokeSize));
-							g2.drawOval(i*cellSize + strokeSize/2, j*cellSize + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+							g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
 						}
+						
+						// Draw the position number
 						g.setColor(Color.WHITE);
-						g.drawString(curPos+"", i*cellSize + cellSize / 2, j*cellSize + cellSize / 2);
+						g.drawString(curPos+"", currentDrawX + cellSize / 2, currentDrawY + cellSize / 2);
 					}
 				}
 			}
 		}
+		int getBit(int mask, int position){
+			return (mask >> position) & 1;
+		}
+		
 		
 		public void flagForMove(HumanPlayer player, Board b) {
 			waitingForMove = true;
-			callbackPlayer = player;
+			playerToNotify = player;
 			gameState.board = b;
 			repaint();
 		}
 		
 		private void makeMove(Board b){
 			if(waitingForMove){
-				callbackPlayer.callback(b);
+				playerToNotify.notifyPlayer(b);
 			}
 			waitingForMove = false;
-			callbackPlayer = null;
+			playerToNotify = null;
 		}
 		
 		private int toNum(int x, int y){
 			return (y*4) + x;
-		}
-		int getBit(int mask, int position){
-			return (mask >> position) & 1;
 		}
 		
 		class BoardMouseListener extends MouseAdapter {
 			@Override 
 			public void mouseClicked(MouseEvent e) {
 				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
-				if(e.getButton() == MouseEvent.BUTTON1){
+				if(waitingForMove && e.getButton() == MouseEvent.BUTTON1){
 					int x = e.getX();
 					int y = e.getY();
 					int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
 					
-					if(waitingForMove && hasDesiredMoves){
+					if(hasDesiredMoves){
 						if(((1 << position) & desiredMoves) > 0){
-							gameState.board.board = movePiece(gameState.board.board, boardGUI.moveFrom, position);
+							
+							//gameState.board.setBoard(movePiece(gameState.board.getBoard(), boardGUI.moveFrom, position));
 							makeMove(gameState.board);
 						}
 					}
@@ -178,42 +181,10 @@ public class GamePanel extends AbstractMenuPanel{
 						boardGUI.hasDesiredMoves = false;
 					}else{
 						boardGUI.hasDesiredMoves = true;
-						boardGUI.desiredMoves = gameState.board.getMoves(Board.PLAYER_1, position) | gameState.board.getMoves(Board.PLAYER_2, position);
-						boardGUI.moveFrom = position;
+						boardGUI.desiredMoves = gameState.board.getMoves(playerToNotify.playerNumber, position);
 					}
 					boardGUI.repaint();
 				}
-			}
-			@Override 
-			public void mouseMoved(MouseEvent e) {
-				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
-				int x = e.getX();
-				int y = e.getY();
-				
-				int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
-				
-				if(position == -1){
-					boardGUI.hasPossibleMoves = false;
-					boardGUI.repaint();
-				}else{
-					boardGUI.hasPossibleMoves = true;
-					boardGUI.possibleMoves = gameState.board.getMoves(Board.PLAYER_1, position) | gameState.board.getMoves(Board.PLAYER_2, position);
-					boardGUI.repaint();
-				}
-				
-			}
-			
-			private int[] movePiece(int[] boardInts, int from, int to){	// Does NOT validate move
-				for(int i = 0; i < boardInts.length; i++){
-					if(getBit(boardInts[i], from) != getBit(boardInts[i], to)){
-						boardInts[i] = toggleBit(boardInts[i], from);
-						boardInts[i] = toggleBit(boardInts[i], to);
-					}
-				}
-				return boardInts;
-			}
-			private int toggleBit(int mask, int position){
-				return mask ^ (1 << position);
 			}
 			
 			private int getPosition(int x, int y, int size){

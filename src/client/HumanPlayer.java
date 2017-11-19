@@ -16,7 +16,6 @@ public class HumanPlayer extends LocalPlayer{
 	public Board getMove(Board board) {		
 		gameBoardUI.flagForMove(this, board);
 		while(true){
-			
 			try {
 				synchronized(lock) {
 					lock.wait();	
@@ -33,7 +32,7 @@ public class HumanPlayer extends LocalPlayer{
 		}
 	}
 	
-	public void callback(Board returnBoard){
+	public void notifyPlayer(Board returnBoard){
 		this.returnBoard = returnBoard;
 		synchronized(lock) {
 			lock.notifyAll();	

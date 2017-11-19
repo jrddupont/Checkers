@@ -38,9 +38,9 @@ public class ServerPlayer extends NetworkedPlayer
 	public Board getMove(Board board) {
 		JSONObject out = new JSONObject();
 		out.put("Opcode", Netwrk.MOVE_REQUEST);
-		out.put("Red", board.board[0]);
-		out.put("Black", board.board[1]);
-		out.put("King", board.board[2]);
+		out.put("Red", board.getBoard()[0]);
+		out.put("Black", board.getBoard()[1]);
+		out.put("King", board.getBoard()[2]);
 		sendPacket(out);
 		processPacket(getMail());
 		return board;

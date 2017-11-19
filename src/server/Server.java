@@ -147,9 +147,9 @@ public class Server {
 						out.put(Netwrk.PLAYER_ONE_TIES, tempGS.playerOneTies);
 						out.put(Netwrk.PLAYER_TWO_TIES, tempGS.playerTwoTies);
 						out.put(Netwrk.GAME_ID, tempGS.gameID);
-						out.put(Netwrk.PLAYER_ONE_BOARD, tempGS.board.board[0]);
-						out.put(Netwrk.PLAYER_TWO_BOARD, tempGS.board.board[1]);
-						out.put(Netwrk.KINGS_BOARD, tempGS.board.board[2]);
+						out.put(Netwrk.PLAYER_ONE_BOARD, tempGS.board.getBoard()[0]);
+						out.put(Netwrk.PLAYER_TWO_BOARD, tempGS.board.getBoard()[1]);
+						out.put(Netwrk.KINGS_BOARD, tempGS.board.getBoard()[2]);
 						
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerOne).sendPacket(out); 
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerTwo).sendPacket(out);
