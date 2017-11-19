@@ -17,15 +17,8 @@ public class Board {
 	public int[] board = new int[3];
 
 	public Board() {
-		System.out.println("Initializing board:\n");
-		System.out.println("Initializing player 1 board:");
 		board[PLAYER_1] = START_1;
-		shittyPrint(board[PLAYER_1]);
-		System.out.println("Player 1 board initialized.\n\nInitializing player 2 board:");
 		board[PLAYER_2] = START_2;
-		shittyPrint(board[PLAYER_2]);
-		System.out.println("Player 2 board initialized\n.");
-		
 		board[KING] = 0;
 	}
 	
