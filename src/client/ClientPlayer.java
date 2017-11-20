@@ -58,6 +58,7 @@ public class ClientPlayer extends NetworkedPlayer{
 			break;
 			
 		case Netwrk.GAME_START:
+			rematch=false;
 			gameState.playerOneUserName = json.get(Netwrk.PLAYER_ONE_UNAME).toString();
 			gameState.playerTwoUserName = json.get(Netwrk.PLAYER_TWO_UNAME).toString();
 			gameState.playerOneWins = ((Long) json.get(Netwrk.PLAYER_ONE_WINS)).intValue();

@@ -42,7 +42,10 @@ public class Game {
 			}
 		}
 	}
-	
+	public void restartGame()
+	{
+		
+	}
 	public GameState getGameState() {
 		return gameState;
 	}

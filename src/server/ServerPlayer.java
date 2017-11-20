@@ -31,6 +31,12 @@ public class ServerPlayer extends NetworkedPlayer
 		case Netwrk.MOVE_REQUEST:
 			board = (Board) json.get("Board");
 			break;
+		case Netwrk.EXIT:
+			socket=null; //break everything to end game
+			break;
+		case Netwrk.REMATCH_REQUEST:
+			rematch=true;
+			break;
 		}	
 	}
 
