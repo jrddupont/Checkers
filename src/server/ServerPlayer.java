@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import util.Board;
 import util.NetworkedPlayer;
 import util.Netwrk;
+import util.PlayerDisconnectException;
 
 public class ServerPlayer extends NetworkedPlayer 
 							implements Runnable{
@@ -35,7 +36,7 @@ public class ServerPlayer extends NetworkedPlayer
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Board getMove(Board board) {
+	public Board getMove(Board board) throws PlayerDisconnectException {
 		JSONObject out = new JSONObject();
 		out.put("Opcode", Netwrk.MOVE_REQUEST);
 		out.put("Red", board.getBoard()[0]);

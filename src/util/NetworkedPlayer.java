@@ -24,7 +24,7 @@ public abstract class NetworkedPlayer extends Player {
 	
 	protected abstract void processPacket(JSONObject json);
 	
-	public JSONObject getMail()
+	public JSONObject getMail() throws PlayerDisconnectException
 	{
 		JSONParser parser = new JSONParser();
 		JSONObject data = null;
@@ -35,7 +35,7 @@ public abstract class NetworkedPlayer extends Player {
 			e.printStackTrace();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new PlayerDisconnectException();			
 		}
 		
 		return data;

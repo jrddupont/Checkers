@@ -3,6 +3,12 @@ package util;
 import java.util.ArrayList;
 import java.util.Random;
 
+/*
+ * XXX whenever player.getMove() is called, PlayerDisconnectException needs to be called
+ *     catch it and set gamestate.endStatus = gamestate.EXIT_REQUESTED
+ *     this will let the server know to clean up resources, and should not affect local play
+ */
+
 public class Game {
 	private GameState gameState;
 	
