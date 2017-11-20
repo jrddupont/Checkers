@@ -124,7 +124,7 @@ public class Board {
 				if (p1Str[pos]=='1') {
 
 					if (p2Str[pos]=='1') { //if pieces overlap, print X to signify badness
-						pieceChar = 'X'; 
+						pieceChar = '#'; 
 					} 
 					else if (kingStr[pos]=='1') { //player1 is 'r' (for red), capital if king
 						pieceChar = 'R';
@@ -143,10 +143,10 @@ public class Board {
 					}
 				}
 
-				boolean isOddIndexedRow = (row % 2 == 1);
+				boolean isEvenIndexedRow = (row % 2 == 0);
 
-				//odd indexed rows have the 'light' space preceding
-				if(isOddIndexedRow) { 
+				//even indexed rows have the 'light' space preceding
+				if(isEvenIndexedRow) { 
 					out.append("|_");
 				}
 
@@ -154,7 +154,7 @@ public class Board {
 				out.append("|" + pieceChar);
 
 				//even indexed rows have the 'light' space following
-				if(!isOddIndexedRow) {
+				if(!isEvenIndexedRow) {
 					out.append("|_");
 				}
 
