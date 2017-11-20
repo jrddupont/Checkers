@@ -28,6 +28,7 @@ public class Server {
 	private PrintWriter printer;
 	
 	private Map<Integer, Game> games = new TreeMap<Integer, Game>();
+	private ArrayList<Integer> killList = new ArrayList<Integer>();
 	
 	final private JSONObject out = new JSONObject();
 	
@@ -49,9 +50,6 @@ public class Server {
 		String playerName;
 		int gamePort = 0;
 		
-		
-		
-		
 		try {
 			System.out.printf("Starting server\n");
 			ssocket = new ServerSocket(port);
@@ -67,6 +65,22 @@ public class Server {
 					data = (JSONObject) ((Object) parser.parse(buffReader.readLine()));
 				} catch (ParseException e) {
 					e.printStackTrace();
+				}
+				
+				// find all the finished games
+				for(Map.Entry<Integer, Game> game : games.entrySet()) {
+					tempGS = game.getValue().getGameState();
+					
+					if(tempGS.endStatus == tempGS.EXIT_REQUESTED) {
+						game.getValue().getCurrentThread().interrupt();
+						killList.add(game.getKey());
+						
+					}
+				}
+				
+				// remove the finished games from the map
+				for(Integer i:killList) {
+					games.remove(i);
 				}
 				
 				

@@ -40,4 +40,8 @@ public class Game {
 	public GameState getGameState() {
 		return gameState;
 	}
+	
+	public Thread getCurrentThread() {
+		return this.getCurrentThread();
+	}
 }
