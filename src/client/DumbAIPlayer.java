@@ -15,7 +15,7 @@ public class DumbAIPlayer extends Player{
 	
 	@Override
 	public Board getMove(Board board) {
-		ArrayList<Board> moves = board.getPossibleMoves(playerNumber);
+		ArrayList<Board> moves = board.getNextStates(playerNumber);
 		return moves.get(rand.nextInt(moves.size()));
 	}
 }

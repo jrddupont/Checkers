@@ -115,7 +115,7 @@ public class GamePanel extends AbstractMenuPanel{
 							g.setColor(Settings.currentTheme.player2Color);
 							g.fillOval(i*cellSize, j*cellSize, cellSize, cellSize);
 						}
-						if(getBit(gameBoard[Board.KING], curPos) == 1){
+						if(getBit(gameBoard[Board.KINGS], curPos) == 1){
 							g.setColor(Settings.currentTheme.kingColor);
 							g.fillOval(i*cellSize + cellSize/4, j*cellSize + cellSize/4, cellSize/2, cellSize/2);
 						}
