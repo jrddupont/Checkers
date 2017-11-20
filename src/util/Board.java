@@ -82,11 +82,8 @@ public class Board {
 	private static void addForwardMoves(ArrayList<Integer> boardList, int board, int moves, int moveOffset) {
 		int x = Integer.lowestOneBit(moves);
 		while(x != 0) {
-			System.out.println("LOG:" + Math.log(x)/Math.log(2));
 			boardList.add(x | board & ~(shift(x, -moveOffset)));
 			moves &= ~x;
-			System.out.println("offset: "+moveOffset);
-			//shittyPrint(x | board & ~(shift(x, -moveOffset)));
 			x = Integer.lowestOneBit(moves);
 		}	
 	}
