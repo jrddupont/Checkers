@@ -35,7 +35,7 @@ public class Board {
 		}
 	}
 
-	public int getNonJumpMoves(int player, int pieceIndex) {
+	public int getNonJumps(int player, int pieceIndex) {
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;
 		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
