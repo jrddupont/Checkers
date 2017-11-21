@@ -217,8 +217,10 @@ public class Board {
 
 	}
 
-	public int playerAt(int player, int position){
-		return getBit(board[player], position);
+	public int playerAt(int position){ //returns PLAYER_0, PLAYER_1 or -1 if empty
+		if (getBit(board[PLAYER_1], position) == 1) return PLAYER_1;
+		if (getBit(board[PLAYER_2], position) == 1) return PLAYER_2;
+		return -1;
 	}
 
 	public boolean hasKingAt(int position){
