@@ -11,7 +11,7 @@ public class NetworkingDemoSprintOne {
 	final protected static byte HELLO = 0;
 	
 	@SuppressWarnings("unchecked")
-	public static void main(String[] args) {
+	public static void main(String[] args) throws PlayerDisconnectException{
 		ClientPlayer alice = new ClientPlayer();
 		ClientPlayer bob = new ClientPlayer();
 		ClientPlayer charles = new ClientPlayer();

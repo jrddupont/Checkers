@@ -24,4 +24,12 @@ public class GameState {
 	public int turn = 0;
 	public int gameID = 0;
 	
+	final public int GAME_IN_PROGRESS = 0;
+	final public int GAME_ENDED = 1;
+	final public int RESTART_REQUESTED = 2; // one player wants to restart
+	final public int RESTART_CONFIRMED = 3; // both players want to restart
+	final public int EXIT_REQUESTED = -1;
+	
+	public int endStatus = 0;
+	
 }
