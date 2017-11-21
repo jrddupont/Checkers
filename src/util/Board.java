@@ -217,8 +217,8 @@ public class Board {
 
 	}
 
-	public boolean hasPlayerAt(int player, int position){
-		return getBit(board[player], position) == 1;
+	public int playerAt(int player, int position){
+		return getBit(board[player], position);
 	}
 
 	public boolean hasKingAt(int position){
