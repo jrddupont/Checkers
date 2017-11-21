@@ -18,9 +18,9 @@ public class Board {
 	private int[] board = new int[3];
 
 	public Board() {
-		getBoard()[PLAYER_1] = START_1;
-		getBoard()[PLAYER_2] = START_2;
-		getBoard()[KINGS] = 0;
+		board[PLAYER_1] = START_1;
+		board[PLAYER_2] = START_2;
+		board[KINGS] = 0;
 	}
 
 	Board(int[] board) {
@@ -35,12 +35,19 @@ public class Board {
 		}
 	}
 
-	public int getMoves(int player, int pieceIndex) {
+	public int getNonJumpMoves(int player, int pieceIndex) {
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;
-		return (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(piece & mask3Neg5 & getBoard()[player], dir*(4 - dir)))
-				| (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(piece & mask5Neg3 & getBoard()[player], dir*(4 + dir))) 
-				| (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(piece & getBoard()[player], dir*4));
+		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
+	}
+
+	public int getMovablePieces(int player) {
+		int dir = player==PLAYER_1 ? 1 : -1;
+		return (shift(~board[player] & ~board[(player+1) % 2], -dir*(4-dir)) & board[player] & mask3Neg5)
+				| (shift(~board[player] & ~board[(player+1) % 2], -dir*(4+dir)) & board[player] & mask5Neg3)
+				| (shift(~board[player] & ~board[(player+1) % 2], -dir*4) & board[player]);
 	}
 
 	public ArrayList<Board> getForwardMoves(int player) {
@@ -53,21 +60,21 @@ public class Board {
 			dir = -1; //player 2 moves in a negative direction
 		}
 
-		int plus3Minus5 = (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(getBoard()[player] & mask3Neg5, dir*(4 - dir)));
-		addForwardMoves(forwardMoveList, getBoard()[player], plus3Minus5, (4-dir)*dir);
+		int plus3Minus5 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask3Neg5, dir*(4 - dir)));
+		addForwardMoves(forwardMoveList, board[player], plus3Minus5, (4-dir)*dir);
 
-		int plus5Minus3 = (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(getBoard()[player] & mask5Neg3, dir*(4 + dir)));
-		addForwardMoves(forwardMoveList, getBoard()[player], plus5Minus3, (4+dir)*dir);
+		int plus5Minus3 = (~board[player] & ~board[(player+1) % 2] & shift(board[player] & mask5Neg3, dir*(4 + dir)));
+		addForwardMoves(forwardMoveList, board[player], plus5Minus3, (4+dir)*dir);
 
-		int plus4Minus4 = (~getBoard()[player] & ~getBoard()[(player+1) % 2] & shift(getBoard()[player], dir*4));
-		addForwardMoves(forwardMoveList, getBoard()[player], plus4Minus4, dir*4);
+		int plus4Minus4 = (~board[player] & ~board[(player+1) % 2] & shift(board[player], dir*4));
+		addForwardMoves(forwardMoveList, board[player], plus4Minus4, dir*4);
 
 		ArrayList<Board> boardList = new ArrayList<>(forwardMoveList.size());
 
 		for(Integer move : forwardMoveList) {
 			int[] newBoard = new int[3];
 			newBoard[player] = move;
-			newBoard[(player+1) % 2] = getBoard()[(player+1) %2];
+			newBoard[(player+1) % 2] = board[(player+1) %2];
 			boardList.add(new Board(newBoard));
 		}
 
@@ -107,9 +114,9 @@ public class Board {
 		StringBuilder out = new StringBuilder(162); 
 
 		//convert each board integer into a string and then a character array
-		char[] p1Str = boardIntToLine(getBoard()[PLAYER_1]).toCharArray();
-		char[] p2Str = boardIntToLine(getBoard()[PLAYER_2]).toCharArray();
-		char[] kingStr = boardIntToLine(getBoard()[KINGS]).toCharArray();
+		char[] p1Str = boardIntToLine(board[PLAYER_1]).toCharArray();
+		char[] p2Str = boardIntToLine(board[PLAYER_2]).toCharArray();
+		char[] kingStr = boardIntToLine(board[KINGS]).toCharArray();
 
 		out.append(" _______________ \n"); //top border
 
@@ -119,12 +126,12 @@ public class Board {
 
 				int pos = piece + row*4; //add row offset
 
-				char pieceChar = '_'; //character representing piece, default underscore for blank square
+				char pieceChar = '-'; //character representing piece, default # for unoccupied square
 
 				if (p1Str[pos]=='1') {
 
 					if (p2Str[pos]=='1') { //if pieces overlap, print X to signify badness
-						pieceChar = '#'; 
+						pieceChar = 'X'; 
 					} 
 					else if (kingStr[pos]=='1') { //player1 is 'r' (for red), capital if king
 						pieceChar = 'R';
@@ -170,10 +177,10 @@ public class Board {
 
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(getBoard());
+		return Arrays.hashCode(board);
 	}
 
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -186,45 +193,42 @@ public class Board {
 			return false;
 		}
 		Board other = (Board) obj;
-		if (!Arrays.equals(getBoard(), other.getBoard())) {
+		if (!Arrays.equals(board, other.board)) {
 			return false;
 		}
 		return true;
 	}
 
-	public ArrayList<Board> getNextStates(int player){
+	public ArrayList<Board> getNextBoards(int player){
 
 		return getForwardMoves(player);
 
 	}
-	
-	public int getJumpMask(int piece){ // Mask of single jumps a given piece can make
+
+	public int getJumps(int player ){ // Mask of single jumps a given piece can make
 		return 0;
 	}
-	public int getNonJumpMask(int piece){ // Mask of moves a given piece can make
+
+	public int jumpAndGetJumps(int from, int jumpedTo){ // Mask of moves a piece can make after jumping to a position (Also mutates the board)
 		return 0;
 	}
-	public int jumpAndGetNextJumpMask(int from, int jumpedTo){ // Mask of moves a piece can make after jumping to a position (Also mutates the board)
-		return 0;
+
+	public void moveTo(int from, int to){ // Mutate the board into new board
+
 	}
-	public void move(int from, int to){ // Mutate the board into new board
-		
-	}
-	public int getForcedJumpMask(int player){ // Mask of a given player's pieces that a must jump
-		return 0;
-	}
-	public int getMoveMask(int player){ // Mask of a given player's pieces can move
-		return 0;
-	}
+
 	public boolean hasPlayerAt(int player, int position){
 		return getBit(board[player], position) == 1;
 	}
+
 	public boolean hasKingAt(int position){
 		return getBit(board[Board.KINGS], position) == 1;
 	}
+
 	int getBit(int mask, int position){
 		return (mask >> position) & 1;
 	}
+
 	public int[] getBoard() {
 		return board;
 	}

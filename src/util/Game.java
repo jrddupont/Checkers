@@ -22,7 +22,7 @@ public class Game {
 		while(true){
 			turnCount++;
 			System.out.printf("Turn:%d \t Player: %s\n", turnCount, turn==0 ? "One" : "Two");
-			ArrayList<Board> possibleMoves = gs.board.getNextStates(turn);
+			ArrayList<Board> possibleMoves = gs.board.getNextBoards(turn);
 			//Board move = players[turn].getMove(gs.board);
 			if (possibleMoves.size() == 0) {
 				System.out.println("Game over.");
