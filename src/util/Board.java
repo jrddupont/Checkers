@@ -13,8 +13,12 @@ public class Board {
 
 	int mask3Neg5 	= 0b11100000111000001110000011100000; //3, -5
 	int mask5Neg3 	= 0b00000111000001110000011100000111; //5, -3
-
-
+	
+	int mask34Neg54 = 0b01110000011100000111000001110000;
+	int mask54Neg34 = 0b00001110000011100000111000001110;
+	int mask43Neg45 = mask5Neg3;
+	int mask45Neg43 = mask3Neg5;
+	
 	private int[] board = new int[3];
 
 	public Board() {
@@ -23,7 +27,7 @@ public class Board {
 		board[KINGS] = 0;
 	}
 
-	Board(int[] board) {
+	public Board(int[] board) {
 		this.board = board;
 	}
 
@@ -35,7 +39,7 @@ public class Board {
 		}
 	}
 
-	public int getNonJumps(int player, int pieceIndex) {
+	public int getNonJumps(int player, int pieceIndex) { //mask of all positions that may be moved into without jumping
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;
 		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
@@ -43,7 +47,7 @@ public class Board {
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
 	}
 
-	public int getMovablePieces(int player) {
+	public int getMovablePieces(int player) { //mask of all pieces that may be moved
 		int dir = player==PLAYER_1 ? 1 : -1;
 		return (shift(~board[player] & ~board[(player+1) % 2], -dir*(4-dir)) & board[player] & mask3Neg5)
 				| (shift(~board[player] & ~board[(player+1) % 2], -dir*(4+dir)) & board[player] & mask5Neg3)
@@ -81,8 +85,54 @@ public class Board {
 		return boardList;
 	}
 
+
 	public ArrayList<Board> getJumpMoves(int player) {
-		//TODO: write this
+		ArrayList<Integer> jumpMoveList = new ArrayList<>(5);
+		int dir; //direction the pieces are moving to go forward
+
+		if(player == PLAYER_1) {
+			dir = 1;
+		} else {
+			dir = -1;
+		}
+
+		int pos34Neg54 = 
+				~board[player] & ~board[(player + 1) % 2] //destination space is empty
+						& shift(board[(player + 1) % 2], 4*dir) //other player occupies space in the middle
+						& shift(board[player], 8*dir-1) //player occupies space where jump originated
+						& mask34Neg54; //legal move
+		
+		System.out.println("pos 34 neg 54");
+		shittyPrint(pos34Neg54);
+
+		int pos54Neg34 =
+				~board[player] & ~board[(player + 1) % 2] //destination
+						& shift(board[(player + 1) % 2], 4*dir) //middle
+						& shift(board[player], 8*dir+1) //origin
+						& mask54Neg34;
+		
+		System.out.println("pos 54 neg 34");
+		shittyPrint(pos54Neg34);
+
+		int pos43Neg45 =
+				~board[player] & ~board[(player + 1) % 2]
+						& shift(board[(player + 1) % 2], 4*dir-1)
+						& shift(board[player], 8*dir-1)
+						& mask43Neg45;
+		
+		System.out.println("pos 43 neg 45");
+		shittyPrint(pos43Neg45);
+
+		int pos45Neg43 =
+				~board[player] & ~board[(player + 1) % 2]
+						& shift(board[(player + 1) % 2], 4*dir+1)
+						& shift(board[player], 8*dir+1)
+						& mask45Neg43;
+		
+		System.out.println("pos 45 neg 43");
+		shittyPrint(pos45Neg43);
+
+		
 		return null;
 	}
 
@@ -205,7 +255,7 @@ public class Board {
 
 	}
 
-	public int getJumps(int player ){ // Mask of single jumps a given piece can make
+	public int getJumps(int player, int piece ){ // Mask of single jumps a given piece can make
 		return 0;
 	}
 
