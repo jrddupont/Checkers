@@ -39,14 +39,6 @@ public class Board {
 		}
 	}
 
-	public int getNonJumps(int player, int pieceIndex) { //mask of all positions that may be moved into without jumping
-		int dir = player==PLAYER_1 ? 1 : -1;
-		int piece = 1<<pieceIndex;
-		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
-				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
-				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
-	}
-
 	public int getMovablePieces(int player) { //mask of all pieces that may be moved
 		
 		int piecesCanJump = 0;
@@ -287,8 +279,23 @@ public class Board {
 		}
 
 	}
+	public int getAllMoves(int player, int pieceIndex){
+		int output = getJumps(player, pieceIndex);
+		if(output == 0){
+			return getNonJumps(player, pieceIndex);
+		}else{
+			return output;
+		}
+	}
+	private int getNonJumps(int player, int pieceIndex) { //mask of all positions that may be moved into without jumping
+		int dir = player==PLAYER_1 ? 1 : -1;
+		int piece = 1<<pieceIndex;
+		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
+				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
+	}
 
-	public int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
+	private int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
 		
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;

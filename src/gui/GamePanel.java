@@ -8,14 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
 
 import util.Board;
-import util.Game;
 import util.GameState;
 import util.Player;
 import util.Settings;
@@ -29,18 +27,19 @@ import client.HumanPlayer;
 public class GamePanel extends AbstractMenuPanel{
 	
 	public GameBoardUI gameBoard;
-	public Player player1;
-	public Player player2;
+	public Player currentPlayer;
 	public GameState gameState = new GameState();
 	
 	public GamePanel(){
 		super();
 		gameBoard = new GameBoardUI(gameState);
 		
-		player1 = new HumanPlayer(gameBoard);
-		player2 = new DumbAIPlayer(Board.PLAYER_2);
-		gameState.PlayerOne = player1;
-		gameState.PlayerTwo = player2;
+		gameState.PlayerOne = new HumanPlayer(gameBoard);
+		gameState.PlayerTwo = new DumbAIPlayer(Board.PLAYER_2);
+		gameState.PlayerOne.playerNumber = Board.PLAYER_1;
+		gameState.PlayerOne.playerNumber = Board.PLAYER_2;
+		currentPlayer = gameState.PlayerOne;
+		
 		
 		JButton mainMenuButton = new JButton("Main menu");
 		add(gameBoard);
@@ -56,8 +55,7 @@ public class GamePanel extends AbstractMenuPanel{
 	
 	public class GameBoardUI extends JComponent{
 		
-		private boolean hasDesiredMoves = false;	// If the player clicked on a piece that has moves
-		private int desiredMoves = 0;	// Mask of possible moves of the currently clicked piece
+		private int selectedPiece = -1;
 		private boolean isJumping = false; // In a state of jumping, IE has jumped and needs to jump again
 		
 		private boolean waitingForMove = false; // If we should listen for moves
@@ -74,7 +72,6 @@ public class GamePanel extends AbstractMenuPanel{
 			
 			BoardMouseListener bml = new BoardMouseListener();
 			addMouseListener(bml);
-			addMouseMotionListener(bml);
 			requestFocus();
 		}
 		
@@ -108,26 +105,39 @@ public class GamePanel extends AbstractMenuPanel{
 						int currentDrawX = i*cellSize;
 						int currentDrawY = j*cellSize;
 						
-						if(gameState.board.hasPlayerAt(Board.PLAYER_1, curPos)){	// If the current position has a player 1 piece
-							g.setColor(Settings.currentTheme.player1Color);
-						}else if(gameState.board.hasPlayerAt(Board.PLAYER_2, curPos)){	// If the current position has a player 2 piece
-							g.setColor(Settings.currentTheme.player2Color);
+						int playerAtCurPos = gameState.board.playerAt(curPos);
+						if(playerAtCurPos >= 0){
+							if(playerAtCurPos == Board.PLAYER_1){	// If the current position has a player 1 piece
+								g.setColor(Settings.currentTheme.player1Color);
+							}else{	// If the current position has a player 2 piece
+								g.setColor(Settings.currentTheme.player2Color);
+							}
+							g.fillOval(currentDrawX, currentDrawY, cellSize, cellSize);
 						}
-						if(getBit( gameState.board.getMoveMask(player), curPos)){
-							
+						if(playerAtCurPos == gameState.turn){
+							if(getBit( gameState.board.getMovablePieces(Board.PLAYER_1), curPos) == 1){
+								g.setColor(Color.GRAY);
+								Graphics2D g2 = (Graphics2D) g;
+								int strokeSize = 6;
+				                g2.setStroke(new BasicStroke(strokeSize));
+								g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+							}
 						}
-						g.fillOval(currentDrawX, currentDrawY, cellSize, cellSize);
 						
 						if(gameState.board.hasKingAt(curPos)){	// If the current position has a king piece
 							g.setColor(Settings.currentTheme.kingColor);
 							g.fillOval(currentDrawX + cellSize/4, currentDrawY + cellSize/4, cellSize/2, cellSize/2);
 						}
-						if(hasDesiredMoves && getBit(desiredMoves, curPos) == 1){	// If the current position has a desired move
-							g.setColor(Color.GREEN);
-							Graphics2D g2 = (Graphics2D) g;
-							int strokeSize = 5;
-			                g2.setStroke(new BasicStroke(strokeSize));
-							g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+						if(selectedPiece != -1){
+							int playerAtSelectedPiece = gameState.board.playerAt(selectedPiece);
+							int drawMask = gameState.board.getAllMoves(playerAtSelectedPiece, selectedPiece);
+							if(getBit(drawMask, curPos) == 1){
+								g.setColor(Color.GREEN);
+								Graphics2D g2 = (Graphics2D) g;
+								int strokeSize = 5;
+				                g2.setStroke(new BasicStroke(strokeSize));
+								g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+							}
 						}
 						
 						// Draw the position number
@@ -144,6 +154,7 @@ public class GamePanel extends AbstractMenuPanel{
 		
 		public void flagForMove(HumanPlayer player, Board b) {
 			waitingForMove = true;
+			selectedPiece = -1;
 			playerToNotify = player;
 			gameState.board = b;
 			repaint();
@@ -165,24 +176,21 @@ public class GamePanel extends AbstractMenuPanel{
 			@Override 
 			public void mouseClicked(MouseEvent e) {
 				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
+				waitingForMove = true;
 				if(waitingForMove && e.getButton() == MouseEvent.BUTTON1){
 					int x = e.getX();
 					int y = e.getY();
 					int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
 					
-					if(hasDesiredMoves){
-						if(((1 << position) & desiredMoves) > 0){
+					if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), position) == 1){
+						selectedPiece = position;
+						System.out.println(position);
+					}else{
+						if(selectedPiece != -1){
 							
-							//gameState.board.setBoard(movePiece(gameState.board.getBoard(), boardGUI.moveFrom, position));
-							makeMove(gameState.board);
 						}
 					}
-					if(position == -1){
-						boardGUI.hasDesiredMoves = false;
-					}else{
-						boardGUI.hasDesiredMoves = true;
-						boardGUI.desiredMoves = gameState.board.getMoves(playerToNotify.playerNumber, position);
-					}
+
 					boardGUI.repaint();
 				}
 			}
