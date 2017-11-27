@@ -33,7 +33,4 @@ public class GameState {
 	final public int EXIT_REQUESTED = -1;
 	
 	public int endStatus = 0;
-	
-	public GameBoardUI gameBoardUI = null;
-	
 }

@@ -1,10 +1,12 @@
 package client;
 
+import gui.GamePanel.GameBoardUI;
 import util.Board;
 import util.GameState;
 
 public class HumanPlayer extends LocalPlayer{
 	GameState gameState;
+	public GameBoardUI gbui = null;
 	Board returnBoard;
 	private final Object lock = new Object();
 	
@@ -14,7 +16,7 @@ public class HumanPlayer extends LocalPlayer{
 	
 	@Override
 	public Board getMove(Board board) {		
-		gameState.gameBoardUI.flagForMove(this, board);
+		gbui.flagForMove(this, board);
 		while(true){
 			try {
 				synchronized(lock) {

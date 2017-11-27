@@ -51,7 +51,7 @@ public class MenuPanel extends AbstractMenuPanel{
 				gameState.PlayerTwo = new DumbAIPlayer(Board.PLAYER_2);
 				gameState.PlayerOne.playerNumber = Board.PLAYER_1;
 				gameState.PlayerOne.playerNumber = Board.PLAYER_2;
-				Driver.switchMenu(new GamePanel(gameState));
+				Driver.switchMenu(new GamePanel(gameState, (HumanPlayer)gameState.PlayerOne));
 			}
 		});
 		onlinePlayButton.addActionListener(new ActionListener() {
