@@ -114,8 +114,8 @@ public class GamePanel extends AbstractMenuPanel{
 							}
 							g.fillOval(currentDrawX, currentDrawY, cellSize, cellSize);
 						}
-						if(playerAtCurPos == gameState.turn){
-							if(getBit( gameState.board.getMovablePieces(Board.PLAYER_1), curPos) == 1){
+						if(playerAtCurPos == currentPlayer.playerNumber){
+							if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), curPos) == 1){
 								g.setColor(Color.GRAY);
 								Graphics2D g2 = (Graphics2D) g;
 								int strokeSize = 6;

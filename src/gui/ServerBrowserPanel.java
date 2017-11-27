@@ -1,7 +1,9 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -18,10 +20,13 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -29,8 +34,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import client.Driver;
 import util.Netwrk;
+import client.Driver;
 
 @SuppressWarnings("serial")
 public class ServerBrowserPanel extends AbstractMenuPanel{
@@ -86,6 +91,34 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Driver.switchMenu(new MenuPanel());
+			}
+		});
+		
+		connectButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+			    JPanel panel = new JPanel(new BorderLayout(5, 5));
+
+			    JPanel label = new JPanel(new GridLayout(0, 1, 2, 2));
+			    label.add(new JLabel("Username", SwingConstants.RIGHT));
+			    label.add(new JLabel("Password", SwingConstants.RIGHT));
+			    panel.add(label, BorderLayout.WEST);
+
+			    JPanel controls = new JPanel(new GridLayout(0, 1, 2, 2));
+			    JTextField username = new JTextField();
+			    controls.add(username);
+			    JPasswordField password = new JPasswordField();
+			    controls.add(password);
+			    panel.add(controls, BorderLayout.CENTER);
+
+			    int choice = JOptionPane.showConfirmDialog(null, panel, "login", JOptionPane.OK_CANCEL_OPTION);
+			    if(choice == JOptionPane.CANCEL_OPTION){
+			    	return;
+			    }
+			    
+			    String usernameText = username.getText();
+			    String passwordText = new String(password.getPassword());
+			    System.out.println(usernameText + " " + passwordText);
 			}
 		});
 		
