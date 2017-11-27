@@ -14,10 +14,13 @@ public class Game {
 	
 	public Game(GameState gs) {
 		gameState = gs;
-		int turn = 0;
-		gs.board = new Board();
-		Random r = new Random();
+	}
+	
+	public void start() {
 		
+		GameState gs = gameState;
+		
+		int turn = 0;
 		int turnCount = 0;
 		System.out.printf("Turn:%d\n", turnCount);
 		System.out.println(gs.board);
