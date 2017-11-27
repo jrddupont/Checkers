@@ -1,20 +1,20 @@
 package client;
 
-import gui.GamePanel.GameBoardUI;
 import util.Board;
+import util.GameState;
 
 public class HumanPlayer extends LocalPlayer{
-	GameBoardUI gameBoardUI;
+	GameState gameState;
 	Board returnBoard;
 	private final Object lock = new Object();
 	
-	public HumanPlayer(GameBoardUI ui){
-		gameBoardUI = ui;
+	public HumanPlayer(GameState gs){
+		gameState = gs;
 	}
 	
 	@Override
 	public Board getMove(Board board) {		
-		gameBoardUI.flagForMove(this, board);
+		gameState.gameBoardUI.flagForMove(this, board);
 		while(true){
 			try {
 				synchronized(lock) {

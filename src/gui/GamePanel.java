@@ -30,16 +30,10 @@ public class GamePanel extends AbstractMenuPanel{
 	public Player currentPlayer;
 	public GameState gameState = new GameState();
 	
-	public GamePanel(){
+	public GamePanel(GameState gameState){
 		super();
+		this.gameState = gameState;
 		gameBoard = new GameBoardUI(gameState);
-		
-		gameState.PlayerOne = new HumanPlayer(gameBoard);
-		gameState.PlayerTwo = new DumbAIPlayer(Board.PLAYER_2);
-		gameState.PlayerOne.playerNumber = Board.PLAYER_1;
-		gameState.PlayerOne.playerNumber = Board.PLAYER_2;
-		currentPlayer = gameState.PlayerOne;
-		
 		
 		JButton mainMenuButton = new JButton("Main menu");
 		add(gameBoard);
@@ -186,8 +180,17 @@ public class GamePanel extends AbstractMenuPanel{
 						selectedPiece = position;
 						System.out.println(position);
 					}else{
-						if(selectedPiece != -1){
-							
+						if(selectedPiece != -1 && getBit(gameState.board.getAllMoves(currentPlayer.playerNumber, selectedPiece), position) == 1){
+							int jumps = gameState.board.getJumps(currentPlayer.playerNumber, selectedPiece);
+							if(jumps > 0){
+								selectedPiece = gameState.board.jumpAndGetJumps(selectedPiece, position);
+								if(gameState.board.getJumps(currentPlayer.playerNumber, selectedPiece) == 0){
+									makeMove(gameState.board);
+								}
+							}else{
+								gameState.board.moveTo(selectedPiece, position);
+								makeMove(gameState.board);
+							}
 						}
 					}
 
