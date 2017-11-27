@@ -48,6 +48,17 @@ public class Board {
 	}
 
 	public int getMovablePieces(int player) { //mask of all pieces that may be moved
+		
+		int piecesCanJump = 0;
+		
+		for (int i = 0; i < 32; i++) {
+			if (getJumps(player, i) != 0) {
+				piecesCanJump |= 1<<i;
+			}
+		}
+		
+		if (piecesCanJump!=0) return piecesCanJump;
+		
 		int dir = player==PLAYER_1 ? 1 : -1;
 		return (shift(~board[player] & ~board[(player+1) % 2], -dir*(4-dir)) & board[player] & mask3Neg5)
 				| (shift(~board[player] & ~board[(player+1) % 2], -dir*(4+dir)) & board[player] & mask5Neg3)
