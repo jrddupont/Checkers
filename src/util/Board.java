@@ -295,7 +295,7 @@ public class Board {
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
 	}
 
-	private int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
+	public int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
 		
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;
@@ -328,12 +328,41 @@ public class Board {
 		return pos34Neg54 | pos54Neg34 | pos43Neg45 | pos45Neg43;
 	}
 
+	
+	private int getBetween(int from, int to){
+        if(from > to){
+            int temp = from;
+            from = to;
+            to = temp;
+        }
+        if((from / 4) % 2 == 0){ // Even row
+            return (from + to + 1) / 2;
+        }else{    // Odd row
+            return (from + to) / 2;
+        }
+    }
+	
+	private int toggleBit(int mask, int position){
+        return mask ^ (1 << position);
+    }
+
+	
 	public int jumpAndGetJumps(int from, int jumpedTo){ // Mask of moves a piece can make after jumping to a position (Also mutates the board)
-		return 0;
+		moveTo(from, jumpedTo);
+		int mask = 1<<getBetween(from, jumpedTo);
+		for(int i=0; i<board.length; i++) {
+			board[i] &= ~mask;
+		}
+		return getJumps(playerAt(jumpedTo), jumpedTo);
 	}
 
 	public void moveTo(int from, int to){ // Mutate the board into new board
-
+		for(int i = 0; i < board.length; i++) {
+			if(getBit(board[i], from) != getBit(board[i], to)) {
+				board[i] = toggleBit(board[i], from);
+				board[i] = toggleBit(board[i], to);
+			}
+		}
 	}
 
 	public int playerAt(int position){ //returns PLAYER_0, PLAYER_1 or -1 if empty

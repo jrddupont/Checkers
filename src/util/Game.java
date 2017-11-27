@@ -14,9 +14,6 @@ public class Game {
 	
 	public Game(GameState gs) {
 		gameState = gs;
-		Player p1 = null;
-		Player p2 = null;
-		Player[] players = {p1, p2};
 		int turn = 0;
 		gs.board = new Board();
 		Random r = new Random();
@@ -25,7 +22,8 @@ public class Game {
 		System.out.printf("Turn:%d\n", turnCount);
 		System.out.println(gs.board);
 		
-		while(true){
+		boolean running = true;
+		while(running){
 			turnCount++;
 			System.out.printf("Turn:%d \t Player: %s\n", turnCount, turn==0 ? "One" : "Two");
 			ArrayList<Board> possibleMoves = gs.board.getNextBoards(turn);
@@ -34,11 +32,18 @@ public class Game {
 				System.out.println("Game over.");
 				return;
 			}
-			Board move = possibleMoves.get(r.nextInt(possibleMoves.size()));
-			if(possibleMoves.contains(move)){ //this works now thanks to .equals() and .hashcode() overrides in Board
-				gs.board = move;
-				System.out.println(move.toString());
-				turn = turn == 0 ? 1 : 0;
+			Board move;
+			try {
+				move = (turn==0 ? gs.PlayerOne.getMove(gs.board) : gs.PlayerTwo.getMove(gs.board));
+				if(possibleMoves.contains(move)){ //this works now thanks to .equals() and .hashcode() overrides in Board
+					gs.board = move;
+					System.out.println(move.toString());
+					turn = turn == 0 ? 1 : 0;
+				}
+			} catch (PlayerDisconnectException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				running = false;
 			}
 		}
 	}

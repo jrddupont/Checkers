@@ -30,16 +30,11 @@ public class GamePanel extends AbstractMenuPanel{
 	public Player currentPlayer;
 	public GameState gameState = new GameState();
 	
-	public GamePanel(){
+	public GamePanel(GameState gameState, HumanPlayer player){
 		super();
+		this.gameState = gameState;
 		gameBoard = new GameBoardUI(gameState);
-		
-		gameState.PlayerOne = new HumanPlayer(gameBoard);
-		gameState.PlayerTwo = new DumbAIPlayer(Board.PLAYER_2);
-		gameState.PlayerOne.playerNumber = Board.PLAYER_1;
-		gameState.PlayerOne.playerNumber = Board.PLAYER_2;
-		currentPlayer = gameState.PlayerOne;
-		
+		currentPlayer = player;
 		
 		JButton mainMenuButton = new JButton("Main menu");
 		add(gameBoard);
@@ -114,7 +109,7 @@ public class GamePanel extends AbstractMenuPanel{
 							}
 							g.fillOval(currentDrawX, currentDrawY, cellSize, cellSize);
 						}
-						if(playerAtCurPos == currentPlayer.playerNumber){
+						if(waitingForMove && playerAtCurPos == currentPlayer.playerNumber){
 							if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), curPos) == 1){
 								g.setColor(Color.GRAY);
 								Graphics2D g2 = (Graphics2D) g;
@@ -128,7 +123,8 @@ public class GamePanel extends AbstractMenuPanel{
 							g.setColor(Settings.currentTheme.kingColor);
 							g.fillOval(currentDrawX + cellSize/4, currentDrawY + cellSize/4, cellSize/2, cellSize/2);
 						}
-						if(selectedPiece != -1){
+						if(waitingForMove && selectedPiece != -1){
+							
 							int playerAtSelectedPiece = gameState.board.playerAt(selectedPiece);
 							int drawMask = gameState.board.getAllMoves(playerAtSelectedPiece, selectedPiece);
 							if(getBit(drawMask, curPos) == 1){
@@ -153,6 +149,7 @@ public class GamePanel extends AbstractMenuPanel{
 		
 		
 		public void flagForMove(HumanPlayer player, Board b) {
+			System.out.println("Player " + player.playerNumber + " waiting for turn");
 			waitingForMove = true;
 			selectedPiece = -1;
 			playerToNotify = player;
@@ -162,10 +159,12 @@ public class GamePanel extends AbstractMenuPanel{
 		
 		private void makeMove(Board b){
 			if(waitingForMove){
+				System.out.println("Player " + playerToNotify.playerNumber + " made turn");
 				playerToNotify.notifyPlayer(b);
 			}
 			waitingForMove = false;
 			playerToNotify = null;
+			selectedPiece = -1;
 		}
 		
 		private int toNum(int x, int y){
@@ -176,7 +175,6 @@ public class GamePanel extends AbstractMenuPanel{
 			@Override 
 			public void mouseClicked(MouseEvent e) {
 				GameBoardUI boardGUI = (GameBoardUI)e.getSource();
-				waitingForMove = true;
 				if(waitingForMove && e.getButton() == MouseEvent.BUTTON1){
 					int x = e.getX();
 					int y = e.getY();
@@ -184,10 +182,19 @@ public class GamePanel extends AbstractMenuPanel{
 					
 					if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), position) == 1){
 						selectedPiece = position;
-						System.out.println(position);
 					}else{
-						if(selectedPiece != -1){
-							
+						if(selectedPiece != -1 && getBit(gameState.board.getAllMoves(currentPlayer.playerNumber, selectedPiece), position) == 1){
+							int jumps = gameState.board.getJumps(currentPlayer.playerNumber, selectedPiece);
+							if(jumps > 0){
+								int possibleJumps = gameState.board.jumpAndGetJumps(selectedPiece, position);
+								if(possibleJumps == 0){
+									makeMove(gameState.board);
+								}
+								selectedPiece = position;
+							}else{
+								gameState.board.moveTo(selectedPiece, position);
+								makeMove(gameState.board);
+							}
 						}
 					}
 

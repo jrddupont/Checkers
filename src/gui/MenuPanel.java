@@ -11,7 +11,11 @@ import java.net.URISyntaxException;
 import javax.swing.Box;
 import javax.swing.JButton;
 
+import util.Board;
+import util.GameState;
 import client.Driver;
+import client.DumbAIPlayer;
+import client.HumanPlayer;
 
 @SuppressWarnings("serial")
 public class MenuPanel extends AbstractMenuPanel{
@@ -42,7 +46,12 @@ public class MenuPanel extends AbstractMenuPanel{
 		localPlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Driver.switchMenu(new GamePanel());
+				GameState gameState = new GameState();
+				gameState.PlayerOne = new HumanPlayer(gameState);
+				gameState.PlayerTwo = new DumbAIPlayer(Board.PLAYER_2);
+				gameState.PlayerOne.playerNumber = Board.PLAYER_1;
+				gameState.PlayerOne.playerNumber = Board.PLAYER_2;
+				Driver.switchMenu(new GamePanel(gameState, (HumanPlayer)gameState.PlayerOne));
 			}
 		});
 		onlinePlayButton.addActionListener(new ActionListener() {
