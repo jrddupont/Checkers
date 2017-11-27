@@ -87,7 +87,7 @@ public class Board {
 
 
 	public ArrayList<Board> getJumpMoves(int player) {
-		ArrayList<Integer> jumpMoveList = new ArrayList<>(5);
+		ArrayList<Board> jumpMoveList = new ArrayList<>(5);
 		int dir; //direction the pieces are moving to go forward
 
 		if(player == PLAYER_1) {
@@ -102,8 +102,8 @@ public class Board {
 						& shift(board[player], 8*dir-1) //player occupies space where jump originated
 						& mask34Neg54; //legal move
 		
-		System.out.println("pos 34 neg 54");
-		shittyPrint(pos34Neg54);
+		//System.out.println("pos 34 neg 54");
+		//shittyPrint(pos34Neg54);
 
 		int pos54Neg34 =
 				~board[player] & ~board[(player + 1) % 2] //destination
@@ -111,8 +111,8 @@ public class Board {
 						& shift(board[player], 8*dir+1) //origin
 						& mask54Neg34;
 		
-		System.out.println("pos 54 neg 34");
-		shittyPrint(pos54Neg34);
+		//System.out.println("pos 54 neg 34");
+		//shittyPrint(pos54Neg34);
 
 		int pos43Neg45 =
 				~board[player] & ~board[(player + 1) % 2]
@@ -120,8 +120,8 @@ public class Board {
 						& shift(board[player], 8*dir-1)
 						& mask43Neg45;
 		
-		System.out.println("pos 43 neg 45");
-		shittyPrint(pos43Neg45);
+		//System.out.println("pos 43 neg 45");
+		//shittyPrint(pos43Neg45);
 
 		int pos45Neg43 =
 				~board[player] & ~board[(player + 1) % 2]
@@ -129,11 +129,15 @@ public class Board {
 						& shift(board[player], 8*dir+1)
 						& mask45Neg43;
 		
-		System.out.println("pos 45 neg 43");
-		shittyPrint(pos45Neg43);
-
+		//System.out.println("pos 45 neg 43");
+		//shittyPrint(pos45Neg43);
 		
-		return null;
+		addJumpMoves(jumpMoveList, player, board, pos34Neg54, 4*dir-1 , 4*dir);
+		addJumpMoves(jumpMoveList, player, board, pos54Neg34, 4*dir+1, 4*dir);
+		addJumpMoves(jumpMoveList, player, board, pos43Neg45, 4*dir, 4*dir-1);
+		addJumpMoves(jumpMoveList, player, board, pos45Neg43, 4*dir, 4*dir+1);
+		
+		return jumpMoveList;
 	}
 
 	private static void addForwardMoves(ArrayList<Integer> boardList, int board, int moves, int moveOffset) {
@@ -143,6 +147,18 @@ public class Board {
 			moves &= ~x;
 			x = Integer.lowestOneBit(moves);
 		}	
+	}
+	
+	private static void addJumpMoves(ArrayList<Board> boardList, int player, int[] boardArr, int moves, int offset1, int offset2) {
+		int x = Integer.lowestOneBit(moves);
+		while (x != 0) {
+			int[] newBoardArr = new int[3];
+			newBoardArr[player] = x | boardArr[player] & ~(shift(x,-(offset2+offset1)));
+			newBoardArr[(player + 1) % 2] = boardArr[(player + 1) % 2] & ~(shift(x, -offset2));
+			boardList.add(new Board(newBoardArr));
+			moves &= ~x;
+			x = Integer.lowestOneBit(moves);
+		}
 	}
 
 	//convert a single board integer into a 32 character string, reversing to correct for endianness
@@ -251,12 +267,47 @@ public class Board {
 
 	public ArrayList<Board> getNextBoards(int player){
 
-		return getForwardMoves(player);
+		ArrayList<Board> jumpMoves = getJumpMoves(player);
+		if(jumpMoves.isEmpty()) {
+			return getForwardMoves(player);
+		}
+		else {
+			return jumpMoves;
+		}
 
 	}
 
-	public int getJumps(int player, int piece ){ // Mask of single jumps a given piece can make
-		return 0;
+	public int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
+		
+		int dir = player==PLAYER_1 ? 1 : -1;
+		int piece = 1<<pieceIndex;
+		
+		int pos34Neg54 = 
+				~board[player] & ~board[(player + 1) % 2] //destination space is empty
+						& shift(board[(player + 1) % 2], 4*dir) //other player occupies space in the middle
+						& shift(piece & board[player], 8*dir-1) //player occupies space where jump originated
+						& mask34Neg54; //legal move
+
+		int pos54Neg34 =
+				~board[player] & ~board[(player + 1) % 2] //destination
+						& shift(board[(player + 1) % 2], 4*dir) //middle
+						& shift(piece & board[player], 8*dir+1) //origin
+						& mask54Neg34;
+		
+
+		int pos43Neg45 =
+				~board[player] & ~board[(player + 1) % 2]
+						& shift(board[(player + 1) % 2], 4*dir-1)
+						& shift(piece & board[player], 8*dir-1)
+						& mask43Neg45;
+	
+		int pos45Neg43 =
+				~board[player] & ~board[(player + 1) % 2]
+						& shift(board[(player + 1) % 2], 4*dir+1)
+						& shift(piece & board[player], 8*dir+1)
+						& mask45Neg43;
+		
+		return pos34Neg54 | pos54Neg34 | pos43Neg45 | pos45Neg43;
 	}
 
 	public int jumpAndGetJumps(int from, int jumpedTo){ // Mask of moves a piece can make after jumping to a position (Also mutates the board)
