@@ -4,7 +4,7 @@ import java.util.*;
 
 import util.GameState;
 public class Database {
-	static Connection db;
+	private static Connection db;
 	private static void connect()
 	{
 		try {
@@ -61,10 +61,15 @@ public class Database {
 				dataSet = query(query, parameters);
 				
 			}
-			query = "select username from checkers.users where username=? and password=?;";
+			query = "select wins, losses, ties from checkers.users where username=? and password=?;";
 			dataSet = query(query, parameters);
 			try {
-				if(dataSet.getFetchSize()>0) data.add(dataSet.getString("username"));
+				if(dataSet.getFetchSize()>0)
+				{
+					data.add(dataSet.getString("wins"));
+					data.add(dataSet.getString("losses"));
+					data.add(dataSet.getString("ties"));
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
