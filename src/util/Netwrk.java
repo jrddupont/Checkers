@@ -15,6 +15,7 @@ public class Netwrk
 	// JSON field names
 	final static public String OPCODE = "opcode";
 	final static public String USER_NAME = "user_name";
+	final static public String PASSWORD = "password";
 	final static public String GAME_ID = "game_id";;
 	final static public String PORT = "port";
 	final static public String PLAYER_ONE_UNAME = "player_one_user_name";

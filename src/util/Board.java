@@ -295,7 +295,7 @@ public class Board {
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
 	}
 
-	private int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
+	public int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
 		
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int piece = 1<<pieceIndex;

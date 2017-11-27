@@ -13,6 +13,8 @@ import util.PlayerDisconnectException;
 public class ClientPlayer extends NetworkedPlayer{
 	
 	public GameState gameState = new GameState();
+	JSONObject out = new JSONObject();
+	
 	public ClientPlayer()
 	{
 		try {
@@ -20,6 +22,22 @@ public class ClientPlayer extends NetworkedPlayer{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public ClientPlayer(String name, String password, int id)
+	{
+		try {
+			socket = new Socket(serverIP, port);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		out.put(Netwrk.OPCODE, Netwrk.HELLO);
+		out.put(Netwrk.GAME_ID, id);
+		out.put(Netwrk.USER_NAME, name);
+		out.put(Netwrk.PASSWORD, password);
+		
+		this.sendPacket(out);
 	}
 	
 	public void go() {
