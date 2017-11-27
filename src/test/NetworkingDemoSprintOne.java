@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 import client.*;
 
 public class NetworkingDemoSprintOne {
-	final protected static byte HELLO = 0;
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws PlayerDisconnectException{
@@ -18,7 +17,7 @@ public class NetworkingDemoSprintOne {
 		
 		
 		JSONObject out = new JSONObject();
-		out.put(Netwrk.OPCODE, HELLO);
+		out.put(Netwrk.OPCODE, Netwrk.HELLO);
 		out.put(Netwrk.GAME_ID, 3);
 		
 		out.put(Netwrk.USER_NAME, "alice");

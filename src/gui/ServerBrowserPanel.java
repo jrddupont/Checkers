@@ -35,6 +35,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import util.Netwrk;
+import client.ClientPlayer;
 import client.Driver;
 
 @SuppressWarnings("serial")
@@ -82,7 +83,7 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
-					serverTextField.setText(serversList.getSelectedValue().toString());
+					serverTextField.setText(serversList.getSelectedValue().toString().split(" ")[1]);
 				}
 			}
 		});
@@ -116,9 +117,14 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			    	return;
 			    }
 			    
-			    String usernameText = username.getText();
-			    String passwordText = new String(password.getPassword());
+			    String usernameText = username.getText().trim();
+			    String passwordText = new String(password.getPassword()).trim();
+			    int gameID = Integer.parseInt(serverTextField.getText().trim());
+			    
+			    
 			    System.out.println(usernameText + " " + passwordText);
+			    
+			    ClientPlayer player = new ClientPlayer(usernameText, passwordText, gameID);
 			}
 		});
 		
