@@ -54,7 +54,7 @@ public class Server {
 			System.out.printf("Starting server\n");
 			ssocket = new ServerSocket(port);
 			
-			for(;;) {
+			MainLoop: for(;;) {
 				System.out.printf("\nwaiting for new player to connect...\n");
 				socket = ssocket.accept();
 				System.out.printf("connected to new player\n");
@@ -72,9 +72,9 @@ public class Server {
 					tempGS = game.getValue().getGameState();
 					
 					if(tempGS.endStatus == tempGS.EXIT_REQUESTED) {
+						Database.updateScores(tempGS);
 						game.getValue().getCurrentThread().interrupt();
 						killList.add(game.getKey());
-						
 					}
 				}
 				
@@ -88,7 +88,9 @@ public class Server {
 				opcode = ((Long)data.get(Netwrk.OPCODE)).byteValue();
 				
 				if(opcode == Netwrk.HELLO) {
-					// validate from DB
+					ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
+					if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
+					
 					playerName = (String)data.get(Netwrk.USER_NAME);
 					
 					// get info from DB
@@ -106,6 +108,9 @@ public class Server {
 							
 							tempGame.getGameState().PlayerTwo = tempPlayer;
 							tempGame.getGameState().playerTwoUserName = playerName;
+							tempGame.getGameState().playerTwoWins = Integer.parseInt(loginInfo.get(1));
+							tempGame.getGameState().playerTwoLosses = Integer.parseInt(loginInfo.get(2));
+							tempGame.getGameState().playerTwoTies = Integer.parseInt(loginInfo.get(3));
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
@@ -125,6 +130,9 @@ public class Server {
 						tempGS = new GameState();
 						tempGS.gameID = gameID;
 						tempGS.playerOneUserName = playerName;
+						tempGS.playerOneWins = Integer.parseInt(loginInfo.get(1));
+						tempGS.playerOneLosses = Integer.parseInt(loginInfo.get(2));
+						tempGS.playerOneTies = Integer.parseInt(loginInfo.get(3));
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
@@ -167,7 +175,7 @@ public class Server {
 						
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerOne).sendPacket(out); 
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerTwo).sendPacket(out);
-						//games.get(gameID).startGame(); //Evan pls
+						games.get(gameID).start(); //needs its own thread
 						
 						System.out.printf("Game %d started\n", gameID);
 					}
