@@ -54,7 +54,7 @@ public class Server {
 			System.out.printf("Starting server\n");
 			ssocket = new ServerSocket(port);
 			
-			for(;;) {
+			MainLoop: for(;;) {
 				System.out.printf("\nwaiting for new player to connect...\n");
 				socket = ssocket.accept();
 				System.out.printf("connected to new player\n");
@@ -72,6 +72,7 @@ public class Server {
 					tempGS = game.getValue().getGameState();
 					
 					if(tempGS.endStatus == tempGS.EXIT_REQUESTED) {
+						Database.updateScores(tempGS);
 						game.getValue().getCurrentThread().interrupt();
 						killList.add(game.getKey());
 						
@@ -88,10 +89,10 @@ public class Server {
 				opcode = ((Long)data.get(Netwrk.OPCODE)).byteValue();
 				
 				if(opcode == Netwrk.HELLO) {
-					// validate from DB
-					playerName = (String)data.get(Netwrk.USER_NAME);
+					ArrayList loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
+					if(loginInfo.isEmpty()) continue MainLoop;
 					
-					// get info from DB
+					playerName = (String)data.get(Netwrk.USER_NAME);
 					
 					int gameID = ((Long)data.get(Netwrk.GAME_ID)).intValue();
 					
@@ -106,6 +107,9 @@ public class Server {
 							
 							tempGame.getGameState().PlayerTwo = tempPlayer;
 							tempGame.getGameState().playerTwoUserName = playerName;
+							tempGame.getGameState().playerTwoWins = (int) loginInfo.get(1);
+							tempGame.getGameState().playerTwoLosses = (int) loginInfo.get(2);
+							tempGame.getGameState().playerTwoTies = (int) loginInfo.get(3);
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
@@ -125,6 +129,9 @@ public class Server {
 						tempGS = new GameState();
 						tempGS.gameID = gameID;
 						tempGS.playerOneUserName = playerName;
+						tempGS.playerOneWins = (int) loginInfo.get(1);
+						tempGS.playerOneLosses = (int) loginInfo.get(2);
+						tempGS.playerOneTies = (int) loginInfo.get(3);
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
