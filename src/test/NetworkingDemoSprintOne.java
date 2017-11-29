@@ -21,12 +21,15 @@ public class NetworkingDemoSprintOne {
 		out.put(Netwrk.GAME_ID, 3);
 		
 		out.put(Netwrk.USER_NAME, "alice");
+		out.put(Netwrk.PASSWORD, "pizza");
 		alice.sendPacket(out);
 		
 		out.put(Netwrk.USER_NAME, "bob");
+		out.put(Netwrk.PASSWORD, "pizza");
 		bob.sendPacket(out);
 		
 		out.put(Netwrk.USER_NAME, "charles");
+		out.put(Netwrk.PASSWORD, "pizza");
 		charles.sendPacket(out);
 		
 		alice.processPacket(alice.getMail());
