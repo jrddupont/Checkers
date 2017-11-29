@@ -4,15 +4,23 @@ import java.net.Socket;
 
 import org.json.simple.JSONObject;
 
+import gui.GamePanel.GameBoardUI;
 import util.Board;
 import util.GameState;
 import util.NetworkedPlayer;
 import util.Netwrk;
 import util.PlayerDisconnectException;
 
-public class ClientPlayer extends NetworkedPlayer{
+public class ClientPlayer extends NetworkedPlayer implements Runnable{
+	
+	public GameBoardUI gameBoardUI = null;
 	
 	public GameState gameState = new GameState();
+	private final Object lock = new Object();
+	Board returnBoard;
+	
+	public String name = null;
+	
 	JSONObject out = new JSONObject();
 	
 	public ClientPlayer()
@@ -75,7 +83,7 @@ public class ClientPlayer extends NetworkedPlayer{
 			gameState.endStatus = gameState.EXIT_REQUESTED;	
 			break;
 			
-		case Netwrk.GAME_START:
+		case Netwrk.GAME_START:		
 			rematch=false;
 			gameState.playerOneUserName = json.get(Netwrk.PLAYER_ONE_UNAME).toString();
 			gameState.playerTwoUserName = json.get(Netwrk.PLAYER_TWO_UNAME).toString();
@@ -85,7 +93,7 @@ public class ClientPlayer extends NetworkedPlayer{
 			gameState.playerTwoLosses = ((Long) json.get(Netwrk.PLAYER_TWO_LOSSES)).intValue();
 			gameState.playerOneTies = ((Long) json.get(Netwrk.PLAYER_ONE_TIES)).intValue();
 			gameState.playerTwoTies = ((Long) json.get(Netwrk.PLAYER_TWO_TIES)).intValue();
-			gameState.gameID = ((Long) json.get(Netwrk.GAME_ID)).intValue();
+			gameState.gameID = ((Long) json.get(Netwrk.GAME_ID)).intValue();			
 			gameState.board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
 			gameState.board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
 			gameState.board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
@@ -102,15 +110,26 @@ public class ClientPlayer extends NetworkedPlayer{
 			break;
 			
 		case Netwrk.MOVE_REQUEST:
-			gameState.board = (Board) json.get(Netwrk.GAME_BOARD);
-			//indicate player turn
-			//wait for player to make move
+			gameState.board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			gameState.board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			gameState.board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
 			
-			JSONObject out = new JSONObject();
+			Board moveBoard = gameState.board;
+			
+			try
+			{
+				moveBoard = getMove(gameState.board);
+			} catch (PlayerDisconnectException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			JSONObject out = new JSONObject();			
 			out.put(Netwrk.OPCODE, Netwrk.MOVE_REQUEST);
-			out.put(Netwrk.PLAYER_ONE_BOARD, gameState.board.getBoard()[0]);
-			out.put(Netwrk.PLAYER_TWO_BOARD, gameState.board.getBoard()[1]);
-			out.put(Netwrk.KINGS_BOARD, gameState.board.getBoard()[2]);
+			out.put(Netwrk.PLAYER_ONE_BOARD, moveBoard.getBoard()[0]);
+			out.put(Netwrk.PLAYER_TWO_BOARD, moveBoard.getBoard()[1]);
+			out.put(Netwrk.KINGS_BOARD, moveBoard.getBoard()[2]);
 			sendPacket(out);
 			break;
 		}
@@ -118,7 +137,64 @@ public class ClientPlayer extends NetworkedPlayer{
 
 	@Override
 	public Board getMove(Board board) throws PlayerDisconnectException{
-		// TODO Auto-generated method stub
-		return null;
+		gameBoardUI.flagForMove(this, board);
+		
+		while(true){
+			try {
+				synchronized(lock) {
+					lock.wait();	
+				}
+			} catch (InterruptedException e) { 
+				e.printStackTrace();
+			}
+			
+			if(returnBoard != null){
+				Board retBrd = returnBoard;
+				returnBoard = null;
+				return retBrd;
+			}
+		}
+	}
+	
+	public void notifyPlayer(Board returnBoard){
+		this.returnBoard = returnBoard;
+		synchronized(lock) {
+			lock.notifyAll();	
+		}
+	}
+
+	@Override
+	public void run()
+	{
+		try
+		{
+			processPacket(getMail());
+			System.out.printf("got my packet 2\n");
+		} catch (PlayerDisconnectException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} // get a game state
+		
+		System.out.printf("username: %s\n", gameState.playerOneUserName);
+		System.out.printf("name %s\n", name);
+		
+		if(gameState.playerOneUserName.equals(name)) {
+	    	gameState.PlayerOne = this;
+	    } else {
+	    	gameState.PlayerTwo = this;
+	    	playerNumber = 1;
+	    }
+		
+		go();
 	}
 }
+
+
+
+
+
+
+
+
+

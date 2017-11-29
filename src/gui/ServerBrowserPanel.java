@@ -34,7 +34,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import util.GameState;
 import util.Netwrk;
+import util.PlayerDisconnectException;
 import client.ClientPlayer;
 import client.Driver;
 
@@ -125,6 +127,34 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 			    System.out.println(usernameText + " " + passwordText);
 			    
 			    ClientPlayer player = new ClientPlayer(usernameText, passwordText, gameID);
+			    
+			    
+			    try
+				{
+					player.processPacket(player.getMail()); // get put into game
+					System.out.printf("got my packet 1\n");
+				} catch (PlayerDisconnectException e1)
+				{
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			    
+			    player.name = usernameText;
+				
+			    GamePanel gamePanel = new GamePanel(player.gameState, player);
+			    
+			    System.out.printf("got my gamePanel\n");
+			    
+			    player.gameBoardUI = gamePanel.gameBoard;
+			    
+			    Driver.switchMenu(gamePanel);
+			    
+			    System.out.printf("switched to my gamePanel... ");
+			    
+			    System.out.printf("going\n");
+			    
+			    Thread thread = new Thread(player);
+			    thread.start();
 			}
 		});
 		

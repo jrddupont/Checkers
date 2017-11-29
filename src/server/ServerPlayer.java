@@ -29,7 +29,9 @@ public class ServerPlayer extends NetworkedPlayer
 		switch(((Long) json.get(Netwrk.OPCODE)).byteValue())
 		{
 		case Netwrk.MOVE_REQUEST:
-			board = (Board) json.get("Board");
+			board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
 			break;
 		case Netwrk.EXIT:
 			socket=null; //break everything to end game
@@ -50,7 +52,7 @@ public class ServerPlayer extends NetworkedPlayer
 		out.put(Netwrk.KINGS_BOARD, board.getBoard()[2]);
 		sendPacket(out);
 		processPacket(getMail());
-		return board;
+		return this.board;
 	}
 	
 	public int getServerPort() {

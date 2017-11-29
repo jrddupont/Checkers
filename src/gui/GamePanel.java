@@ -17,6 +17,7 @@ import util.Board;
 import util.GameState;
 import util.Player;
 import util.Settings;
+import client.ClientPlayer;
 import client.Driver;
 import client.DumbAIPlayer;
 import client.HumanPlayer;
@@ -30,7 +31,7 @@ public class GamePanel extends AbstractMenuPanel{
 	public Player currentPlayer;
 	public GameState gameState = new GameState();
 	
-	public GamePanel(GameState gameState, HumanPlayer player){
+	public GamePanel(GameState gameState, Player player){
 		super();
 		this.gameState = gameState;
 		gameBoard = new GameBoardUI(gameState);
@@ -48,13 +49,14 @@ public class GamePanel extends AbstractMenuPanel{
 		});
 	}
 	
+
 	public class GameBoardUI extends JComponent{
 		
 		private int selectedPiece = -1;
 		private boolean isJumping = false; // In a state of jumping, IE has jumped and needs to jump again
 		
 		private boolean waitingForMove = false; // If we should listen for moves
-		private HumanPlayer playerToNotify = null;	// What player to notify of changes
+		private Player playerToNotify = null;	// What player to notify of changes
 		
 		GameState gameState;
 		
@@ -145,7 +147,7 @@ public class GamePanel extends AbstractMenuPanel{
 		}
 		
 		
-		public void flagForMove(HumanPlayer player, Board b) {
+		public void flagForMove(Player player, Board b) {
 			System.out.println("Player " + player.playerNumber + " waiting for turn");
 			waitingForMove = true;
 			selectedPiece = -1;
@@ -154,10 +156,15 @@ public class GamePanel extends AbstractMenuPanel{
 			repaint();
 		}
 		
+		
 		private void makeMove(Board b){
 			if(waitingForMove){
 				System.out.println("Player " + playerToNotify.playerNumber + " made turn");
-				playerToNotify.notifyPlayer(b);
+				
+				if(playerToNotify instanceof HumanPlayer)
+					((HumanPlayer) playerToNotify).notifyPlayer(b);
+				else
+					((ClientPlayer) playerToNotify).notifyPlayer(b);
 			}
 			waitingForMove = false;
 			playerToNotify = null;
