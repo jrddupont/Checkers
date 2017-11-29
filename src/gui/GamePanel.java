@@ -162,6 +162,7 @@ public class GamePanel extends AbstractMenuPanel{
 			waitingForMove = false;
 			playerToNotify = null;
 			selectedPiece = -1;
+			isJumping = false;
 		}
 		
 		private int toNum(int x, int y){
@@ -177,15 +178,20 @@ public class GamePanel extends AbstractMenuPanel{
 					int y = e.getY();
 					int position = getPosition(x, y,  Math.min(boardGUI.getWidth(), boardGUI.getHeight()));
 					
-					if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), position) == 1){
+					// If they clicked on a selectable piece
+					if(!isJumping && getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), position) == 1){
 						selectedPiece = position;
 					}else{
 						if(selectedPiece != -1 && getBit(gameState.board.getAllMoves(currentPlayer.playerNumber, selectedPiece), position) == 1){
 							int jumps = gameState.board.getJumps(currentPlayer.playerNumber, selectedPiece);
 							if(jumps > 0){
 								int possibleJumps = gameState.board.jumpAndGetJumps(selectedPiece, position);
+								isJumping = true;
+								System.out.println("Jump");
+								System.out.println(Integer.toBinaryString(possibleJumps));
 								if(possibleJumps == 0){
 									makeMove(gameState.board);
+									System.out.println("Made move");
 								}
 								selectedPiece = position;
 							}else{

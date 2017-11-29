@@ -17,7 +17,6 @@ import javax.swing.WindowConstants;
 import util.Board;
 import util.Game;
 import util.GameState;
-import client.AIPlayer;
 import client.Driver;
 import client.DumbAIPlayer;
 import client.HumanPlayer;
