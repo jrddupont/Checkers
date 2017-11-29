@@ -87,17 +87,17 @@ public class Board {
 
 		return boardList;
 	}
-
-
+	
 	public ArrayList<Board> getJumpMoves(int player) {
-		ArrayList<Board> jumpMoveList = new ArrayList<>(5);
-		int dir; //direction the pieces are moving to go forward
-
-		if(player == PLAYER_1) {
-			dir = 1;
-		} else {
-			dir = -1;
+		ArrayList<Board> moveList =  getJumpMoves(player,  player==PLAYER_1 ? 1 : -1, board[player]);
+		if ((board[player] & board[KINGS]) !=0) {
+			moveList.addAll(getJumpMoves(player, player==PLAYER_1 ? -1 : 1, board[player] & board[KINGS]));
 		}
+		return moveList;
+	}
+	
+	private ArrayList<Board> getJumpMoves(int player, int dir, int pieceMask) {
+		ArrayList<Board> jumpMoveList = new ArrayList<>(5);
 
 		int pos34Neg54 = 
 				~board[player] & ~board[(player + 1) % 2] //destination space is empty
@@ -105,17 +105,11 @@ public class Board {
 						& shift(board[player], 8*dir-1) //player occupies space where jump originated
 						& mask34Neg54; //legal move
 		
-		//System.out.println("pos 34 neg 54");
-		//shittyPrint(pos34Neg54);
-
 		int pos54Neg34 =
 				~board[player] & ~board[(player + 1) % 2] //destination
 						& shift(board[(player + 1) % 2], 4*dir) //middle
 						& shift(board[player], 8*dir+1) //origin
 						& mask54Neg34;
-		
-		//System.out.println("pos 54 neg 34");
-		//shittyPrint(pos54Neg34);
 
 		int pos43Neg45 =
 				~board[player] & ~board[(player + 1) % 2]
@@ -123,17 +117,11 @@ public class Board {
 						& shift(board[player], 8*dir-1)
 						& mask43Neg45;
 		
-		//System.out.println("pos 43 neg 45");
-		//shittyPrint(pos43Neg45);
-
 		int pos45Neg43 =
 				~board[player] & ~board[(player + 1) % 2]
 						& shift(board[(player + 1) % 2], 4*dir+1)
 						& shift(board[player], 8*dir+1)
 						& mask45Neg43;
-		
-		//System.out.println("pos 45 neg 43");
-		//shittyPrint(pos45Neg43);
 		
 		addJumpMoves(jumpMoveList, player, board, pos34Neg54, 4*dir-1 , 4*dir);
 		addJumpMoves(jumpMoveList, player, board, pos54Neg34, 4*dir+1, 4*dir);
@@ -158,6 +146,7 @@ public class Board {
 			int[] newBoardArr = new int[3];
 			newBoardArr[player] = x | boardArr[player] & ~(shift(x,-(offset2+offset1)));
 			newBoardArr[(player + 1) % 2] = boardArr[(player + 1) % 2] & ~(shift(x, -offset2));
+			newBoardArr[KINGS] = x | boardArr[KINGS] & ~(shift(x, -(offset2+offset1)));
 			boardList.add(new Board(newBoardArr));
 			moves &= ~x;
 			x = Integer.lowestOneBit(moves);
@@ -328,6 +317,14 @@ public class Board {
 		return pos34Neg54 | pos54Neg34 | pos43Neg45 | pos45Neg43;
 	}
 
+	private void calculateKings(int player) {
+		if (player == PLAYER_1) {
+			board[KINGS] |= board[player] & 0xF0000000;
+		} else {
+			board[KINGS] |= board[player] & 0xF;
+		} 
+	}
+	
 	
 	private int getBetween(int from, int to){
         if(from > to){
@@ -363,6 +360,7 @@ public class Board {
 				board[i] = toggleBit(board[i], to);
 			}
 		}
+		calculateKings(playerAt(to));
 	}
 
 	public int playerAt(int position){ //returns PLAYER_0, PLAYER_1 or -1 if empty
