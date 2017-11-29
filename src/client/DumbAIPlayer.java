@@ -9,6 +9,7 @@ import util.Player;
 public class DumbAIPlayer extends Player{
 	int playerNumber = 0;
 	Random rand = new Random();
+	
 	public DumbAIPlayer(int pn){
 		playerNumber = pn;
 	}

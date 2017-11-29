@@ -6,7 +6,7 @@ import util.GameState;
 
 public class HumanPlayer extends LocalPlayer{
 	GameState gameState;
-	public GameBoardUI gbui = null;
+	public GameBoardUI gameBoardUI = null;
 	Board returnBoard;
 	private final Object lock = new Object();
 	
@@ -16,7 +16,7 @@ public class HumanPlayer extends LocalPlayer{
 	
 	@Override
 	public Board getMove(Board board) {		
-		gbui.flagForMove(this, board);
+		gameBoardUI.flagForMove(this, board);
 		while(true){
 			try {
 				synchronized(lock) {

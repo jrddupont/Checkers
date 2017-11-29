@@ -23,13 +23,13 @@ public class MakeMoveDemo {
 		gameState.PlayerOne = new HumanPlayer(gameState);
 		gameState.PlayerTwo = new HumanPlayer(gameState);
 		gameState.PlayerOne.playerNumber = Board.PLAYER_1;
-		gameState.PlayerOne.playerNumber = Board.PLAYER_2;
+		gameState.PlayerTwo.playerNumber = Board.PLAYER_2;
 
 		GamePanel gp1 = new GamePanel(gameState, (HumanPlayer)gameState.PlayerOne);
 		GamePanel gp2 = new GamePanel(gameState, (HumanPlayer)gameState.PlayerTwo);
 		
-		((HumanPlayer)(gameState.PlayerOne)).gbui = gp1.gameBoard;
-		((HumanPlayer)(gameState.PlayerTwo)).gbui = gp2.gameBoard;
+		((HumanPlayer)(gameState.PlayerOne)).gameBoardUI = gp1.gameBoard;
+		((HumanPlayer)(gameState.PlayerTwo)).gameBoardUI = gp2.gameBoard;
 		
 		mainFrame1.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		mainFrame1.setSize(AbstractMenuPanel.size);

@@ -61,9 +61,6 @@ public class GamePanel extends AbstractMenuPanel{
 		public GameBoardUI(GameState gs){
 			gameState = gs;
 			Random r = new Random();
-			gameState.board = new Board();
-			gameState.board.getBoard()[0] = r.nextInt() >>> 16;
-			gameState.board.getBoard()[1] = r.nextInt() << 16;
 			
 			BoardMouseListener bml = new BoardMouseListener();
 			addMouseListener(bml);
