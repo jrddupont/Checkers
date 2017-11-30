@@ -18,6 +18,9 @@ public class Theme {
 	public Color player2Color;
 	public Color kingColor;
 	
+	/**
+	 * Creates a new theme with all default values.
+	 */
 	public Theme(){
 		name = "Default";
 		lightBoardColor = defaultLightBoardColor;
@@ -27,6 +30,10 @@ public class Theme {
 		kingColor = defaultKingColor;
 	}
 	
+	/**
+	 * Creates a new theme object with data from a JSON file
+	 * @param json The JSON to load from
+	 */
 	public Theme(JSONObject json){
 		name = (String) json.get("name");
 		lightBoardColor = new Color(((Long) json.get("light")).intValue());
@@ -36,6 +43,10 @@ public class Theme {
 		kingColor = new Color(((Long) json.get("king")).intValue());
 	}
 
+	/**
+	 * Duplicates a theme
+	 * @param oldTheme Theme to duplicate
+	 */
 	public Theme(Theme oldTheme) {
 		name = oldTheme.name;
 		lightBoardColor = oldTheme.lightBoardColor;
@@ -45,6 +56,10 @@ public class Theme {
 		kingColor = oldTheme.kingColor;
 	}
 
+	/**
+	 * Creates a JSON object based off the data in the current theme
+	 * @return	JSON object of theme data
+	 */
 	@SuppressWarnings("unchecked")
 	public JSONObject getJSONObject() {
 		JSONObject output = new JSONObject();

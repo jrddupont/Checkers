@@ -6,6 +6,11 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+
+/**
+ * An abstract panel class that all the UI panels extend. This makes swapping the panels easier
+ *
+ */
 @SuppressWarnings("serial")
 public abstract class AbstractMenuPanel extends JPanel{
 	public static final Dimension size = new Dimension(400, 600);

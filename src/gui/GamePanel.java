@@ -12,6 +12,9 @@ import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+
+import org.omg.CosNaming.IstringHelper;
 
 import util.Board;
 import util.GameState;
@@ -31,6 +34,9 @@ public class GamePanel extends AbstractMenuPanel{
 	public Player currentPlayer;
 	public GameState gameState = new GameState();
 	
+	public JLabel playerOneJLabel = new JLabel();
+	public JLabel playerTwoJLabel = new JLabel();
+	
 	public GamePanel(GameState gameState, Player player){
 		super();
 		this.gameState = gameState;
@@ -38,6 +44,9 @@ public class GamePanel extends AbstractMenuPanel{
 		currentPlayer = player;
 		
 		JButton mainMenuButton = new JButton("Main menu");
+		
+		add(playerOneJLabel);
+		add(playerTwoJLabel);
 		add(gameBoard);
 		add(mainMenuButton);
 		
@@ -62,7 +71,6 @@ public class GamePanel extends AbstractMenuPanel{
 		
 		public GameBoardUI(GameState gs){
 			gameState = gs;
-			Random r = new Random();
 			
 			BoardMouseListener bml = new BoardMouseListener();
 			addMouseListener(bml);
@@ -71,6 +79,15 @@ public class GamePanel extends AbstractMenuPanel{
 		
 		@Override
 		public void paint(Graphics g){
+			
+			if(gameState.PlayerOne instanceof ClientPlayer || gameState.PlayerTwo instanceof ClientPlayer){
+				playerOneJLabel.setText(gameState.playerOneUserName + ": " + gameState.playerOneWins + "/" + gameState.playerOneLosses + "/" + gameState.playerOneTies);
+				playerTwoJLabel.setText(gameState.playerTwoUserName + ": " + gameState.playerTwoWins + "/" + gameState.playerTwoLosses + "/" + gameState.playerTwoTies);
+			}else{
+				playerOneJLabel.setText("");
+				playerTwoJLabel.setText("");
+			}
+			
 			int boardSize = Math.min(getWidth(), getHeight());
 			int cellSize = boardSize / 8;
 			boardSize = cellSize * 8;
@@ -171,10 +188,11 @@ public class GamePanel extends AbstractMenuPanel{
 			if(waitingForMove){
 				System.out.println("Player " + playerToNotify.playerNumber + " made turn");
 				
-				if(playerToNotify instanceof HumanPlayer)
+				if(playerToNotify instanceof HumanPlayer){
 					((HumanPlayer) playerToNotify).notifyPlayer(b);
-				else
+				}else{
 					((ClientPlayer) playerToNotify).notifyPlayer(b);
+				}
 			}
 			waitingForMove = false;
 			playerToNotify = null;

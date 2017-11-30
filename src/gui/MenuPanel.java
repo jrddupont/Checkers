@@ -54,6 +54,7 @@ public class MenuPanel extends AbstractMenuPanel{
 			    String input = (String) JOptionPane.showInputDialog(null, "How would you like to play?", "Local Play", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
 			    if(input.equals("Player vs Player")){
 			    	startPVPGame();
+			    	Driver.mainFrame.setVisible(false);
 			    }else{
 			    	startPVEGame();
 			    }
@@ -118,7 +119,15 @@ public class MenuPanel extends AbstractMenuPanel{
 		    @Override
 		    public void run() {
 		    	Game game = new Game(gameState);
-				game.start();        
+				game.start();     
+				if(game.getGameState().turn == Board.PLAYER_1){
+					JOptionPane.showMessageDialog(null, "You win!");
+				}else{
+					JOptionPane.showMessageDialog(null, "You lose!");
+				}
+				Driver.mainFrame.setVisible(true);
+				mainFrame1.dispose();
+				mainFrame2.dispose();
 		    }
 		});
 		thread.start();
@@ -143,6 +152,11 @@ public class MenuPanel extends AbstractMenuPanel{
 		    public void run() {
 		    	Game game = new Game(gameState);
 				game.start();
+				if(game.getGameState().turn == Board.PLAYER_1){
+					JOptionPane.showMessageDialog(null, "You win!");
+				}else{
+					JOptionPane.showMessageDialog(null, "You lose!");
+				}
 		    }
 		});
 		thread.start();
