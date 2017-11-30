@@ -283,10 +283,18 @@ public class Board {
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & board[player], dir*4));
 	}
-
-	public int getJumps(int player, int pieceIndex){ // Mask of single jumps a given piece can make
-		
+	
+	public int getJumps(int player, int pieceIndex) {
 		int dir = player==PLAYER_1 ? 1 : -1;
+		int moves = getJumps(player, dir, pieceIndex);
+		if ((board[KINGS]&(1<<pieceIndex))!=0) {
+			moves &= getJumps(player, dir*-1, pieceIndex);
+		}
+		return moves;
+	}
+	
+	public int getJumps(int player, int dir, int pieceIndex){ // Mask of single jumps a given piece can make
+	
 		int piece = 1<<pieceIndex;
 		
 		int pos34Neg54 = 
