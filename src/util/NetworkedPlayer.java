@@ -18,7 +18,6 @@ public abstract class NetworkedPlayer extends Player {
 	
 	protected Socket socket = null;
 	protected int port = 12321;
-	protected String serverIP = Netwrk.IP_ADDRESS;
 	protected BufferedReader buffReader;
 	
 	

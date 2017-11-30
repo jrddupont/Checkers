@@ -54,7 +54,7 @@ public class Server {
 		
 		try {
 			System.out.printf("Starting server\n");
-			ssocket = new ServerSocket(port, 256, Inet4Address.getByName(Netwrk.IP_ADDRESS));
+			ssocket = new ServerSocket(port);
 			
 			MainLoop: for(;;) {
 				System.out.printf("\nwaiting for new client to connect...\n");

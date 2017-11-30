@@ -26,7 +26,7 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 	public ClientPlayer()
 	{
 		try {
-			socket = new Socket(serverIP, port);
+			socket = new Socket(Netwrk.IP_ADDRESS, port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +35,7 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 	public ClientPlayer(String name, String password, int id)
 	{
 		try {
-			socket = new Socket(serverIP, port);
+			socket = new Socket(Netwrk.IP_ADDRESS, port);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,7 +70,7 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 					socket.close();
 					port = ((Long) json.get(Netwrk.PORT)).intValue();
 					
-					socket = new Socket(serverIP, port);
+					socket = new Socket(Netwrk.IP_ADDRESS, port);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
