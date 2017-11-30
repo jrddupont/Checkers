@@ -167,7 +167,7 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 //		listModel.addElement("connect");
 //		listModel.addElement("to.");
 		
-		updateServerList(getGamesListFromServer("127.0.0.1"));
+		updateServerList(getGamesListFromServer(Netwrk.IP_ADDRESS));
 	}
 	
 	public void updateServerList(String[] servers){

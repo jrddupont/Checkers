@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.ServerSocket;
 
 import org.json.simple.JSONObject;
@@ -17,7 +18,7 @@ public class ServerPlayer extends NetworkedPlayer
 	
 	public ServerPlayer() {
 		try {
-			ssocket = new ServerSocket(0);
+			ssocket = new ServerSocket(0, 256, Inet4Address.getByName(Netwrk.IP_ADDRESS));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

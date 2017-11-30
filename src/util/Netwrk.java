@@ -2,6 +2,8 @@ package util;
 
 public class Netwrk
 {
+	final static public String IP_ADDRESS = "127.0.0.1";
+	
 	// opcodes
 	final static public byte HELLO = 0;
 	final static public byte EXIT = 1;
