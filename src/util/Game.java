@@ -33,6 +33,18 @@ public class Game {
 			//Board move = players[turn].getMove(gs.board);
 			if (possibleMoves.size() == 0) {
 				System.out.println("Game over.");
+				if (turn==Board.PLAYER_1) {
+					System.out.println("Player two wins");
+					gs.playerTwoWins++;
+					gs.playerOneLosses++;
+					
+				} else {
+					System.out.println("Player one wins");
+					gs.playerOneWins++;
+					gs.playerTwoLosses++;
+				}
+				gs.PlayerOne.gameEnd(gs);
+				gs.PlayerTwo.gameEnd(gs);
 				return;
 			}
 			Board move;

@@ -20,7 +20,6 @@ public abstract class NetworkedPlayer extends Player {
 	protected int port = 12321;
 	protected BufferedReader buffReader;
 	
-	
 	protected abstract void processPacket(JSONObject json);
 	
 	public JSONObject getMail() throws PlayerDisconnectException

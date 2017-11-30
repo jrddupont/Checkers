@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import org.json.simple.JSONObject;
 
 import util.Board;
+import util.GameState;
 import util.NetworkedPlayer;
 import util.Netwrk;
 import util.PlayerDisconnectException;
@@ -74,5 +75,14 @@ public class ServerPlayer extends NetworkedPlayer
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void gameEnd(GameState g) {
+		JSONObject out = new JSONObject();
+		out.put(Netwrk.OPCODE, Netwrk.GAME_END);
+		//Maybe tell who won
+		sendPacket(out);
+		
 	}
 }

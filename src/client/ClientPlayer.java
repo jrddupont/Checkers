@@ -198,6 +198,12 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 		
 		go();
 	}
+
+	@Override
+	public void gameEnd(GameState g) {
+		// TODO Auto-generated method stub
+		
+	}
 }
 
 
