@@ -26,10 +26,12 @@ public class ServerPlayer extends NetworkedPlayer
 
 	@Override
 	public void processPacket(JSONObject json) {
-		switch(((Long) json.get("Opcode")).byteValue())
+		switch(((Long) json.get(Netwrk.OPCODE)).byteValue())
 		{
 		case Netwrk.MOVE_REQUEST:
-			board = (Board) json.get("Board");
+			board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
 			break;
 		case Netwrk.EXIT:
 			socket=null; //break everything to end game
@@ -44,13 +46,13 @@ public class ServerPlayer extends NetworkedPlayer
 	@Override
 	public Board getMove(Board board) throws PlayerDisconnectException {
 		JSONObject out = new JSONObject();
-		out.put("Opcode", Netwrk.MOVE_REQUEST);
-		out.put("Red", board.getBoard()[0]);
-		out.put("Black", board.getBoard()[1]);
-		out.put("King", board.getBoard()[2]);
+		out.put(Netwrk.OPCODE, Netwrk.MOVE_REQUEST);
+		out.put(Netwrk.PLAYER_ONE_BOARD, board.getBoard()[0]);
+		out.put(Netwrk.PLAYER_TWO_BOARD, board.getBoard()[1]);
+		out.put(Netwrk.KINGS_BOARD, board.getBoard()[2]);
 		sendPacket(out);
 		processPacket(getMail());
-		return board;
+		return this.board;
 	}
 	
 	public int getServerPort() {
