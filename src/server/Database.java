@@ -8,7 +8,7 @@ public class Database {
 	private static void stupidCheck()
 	{
 		query("CREATE SCHEMA if not exists `checkers`", null);
-		query("CREATE TABLE if not exists checkers.users (`password` varchar(20), `username` varchar(20),"
+		query("CREATE TABLE if not exists checkers.users (`password` varchar(64), `username` varchar(20),"
 		+"`wins` int default 0, `losses` int default 0, `ties` int default 0, primary key (`username`))", null);
 	}
 	private static void connect()
@@ -58,7 +58,7 @@ public class Database {
 		ArrayList<String> data = new ArrayList<String>();
 		ArrayList<String> parameters = new ArrayList<String>();
 		
-		if(user.length()>20 || pass.length()>20)
+		if(user.length()>20 || pass.length()>64)
 			return data;
 		
 		parameters.add(user);

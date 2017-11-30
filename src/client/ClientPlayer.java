@@ -50,11 +50,10 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		out.put(Netwrk.OPCODE, Netwrk.HELLO);
 		out.put(Netwrk.GAME_ID, id);
 		out.put(Netwrk.USER_NAME, name);
-		out.put(Netwrk.PASSWORD, newPass);
+		out.put(Netwrk.PASSWORD, newPass.substring(0, 32));
 		
 		this.sendPacket(out);
 	}

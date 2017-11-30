@@ -93,7 +93,6 @@ public class Server {
 					System.out.printf("Client is a player\n");
 					ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
 					if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
-					
 					playerName = (String)data.get(Netwrk.USER_NAME);
 					
 					// get info from DB
