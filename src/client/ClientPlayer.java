@@ -64,7 +64,8 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 			try {
 				processPacket(getMail());
 			} catch (PlayerDisconnectException e) {
-				e.printStackTrace();
+				System.err.printf("Discennected\n");
+				System.exit(0);
 			}
 		}
 	}
