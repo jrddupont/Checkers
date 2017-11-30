@@ -38,11 +38,12 @@ public class Game {
 			Board move;
 			try {
 				move = (turn==0 ? gs.PlayerOne.getMove(gs.board) : gs.PlayerTwo.getMove(gs.board));
-				if(possibleMoves.contains(move)){ //this works now thanks to .equals() and .hashcode() overrides in Board
-					gs.board = move;
-					System.out.println(move.toString());
-					turn = turn == 0 ? 1 : 0;
-				}
+				//if(possibleMoves.contains(move)){ //this works now thanks to .equals() and .hashcode() overrides in Board
+				//	gs.board = move;
+				//	System.out.println(move.toString());
+				//	turn = turn == 0 ? 1 : 0;
+				//}
+				turn = turn == 0 ? 1 : 0;
 			} catch (PlayerDisconnectException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
