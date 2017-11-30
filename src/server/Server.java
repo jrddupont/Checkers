@@ -91,8 +91,8 @@ public class Server {
 				
 				if(opcode == Netwrk.HELLO) {
 					System.out.printf("Client is a player\n");
-					//ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
-					//if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
+					ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
+					if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
 					
 					playerName = (String)data.get(Netwrk.USER_NAME);
 					
@@ -111,9 +111,9 @@ public class Server {
 							
 							tempGame.getGameState().PlayerTwo = tempPlayer;
 							tempGame.getGameState().playerTwoUserName = playerName;
-							//tempGame.getGameState().playerTwoWins = Integer.parseInt(loginInfo.get(1));
-							//tempGame.getGameState().playerTwoLosses = Integer.parseInt(loginInfo.get(2));
-							//tempGame.getGameState().playerTwoTies = Integer.parseInt(loginInfo.get(3));
+							tempGame.getGameState().playerTwoWins = Integer.parseInt(loginInfo.get(1));
+							tempGame.getGameState().playerTwoLosses = Integer.parseInt(loginInfo.get(2));
+							tempGame.getGameState().playerTwoTies = Integer.parseInt(loginInfo.get(3));
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
@@ -133,9 +133,9 @@ public class Server {
 						tempGS = new GameState();
 						tempGS.gameID = gameID;
 						tempGS.playerOneUserName = playerName;
-						//tempGS.playerOneWins = Integer.parseInt(loginInfo.get(1));
-						//tempGS.playerOneLosses = Integer.parseInt(loginInfo.get(2));
-						//tempGS.playerOneTies = Integer.parseInt(loginInfo.get(3));
+						tempGS.playerOneWins = Integer.parseInt(loginInfo.get(1));
+						tempGS.playerOneLosses = Integer.parseInt(loginInfo.get(2));
+						tempGS.playerOneTies = Integer.parseInt(loginInfo.get(3));
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();

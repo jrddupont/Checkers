@@ -18,7 +18,7 @@ public class ServerPlayer extends NetworkedPlayer
 	
 	public ServerPlayer() {
 		try {
-			ssocket = new ServerSocket(0, 256, Inet4Address.getByName(Netwrk.IP_ADDRESS));
+			ssocket = new ServerSocket(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
