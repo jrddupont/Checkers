@@ -77,11 +77,28 @@ public class ServerPlayer extends NetworkedPlayer
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void gameEnd(GameState g) {
+	public void gameEnd(GameState gs) {
 		JSONObject out = new JSONObject();
-		out.put(Netwrk.OPCODE, Netwrk.GAME_END);
+		
 		//Maybe tell who won
+		
+		out.clear();
+		out.put(Netwrk.OPCODE, Netwrk.GAME_END);
+		out.put(Netwrk.PLAYER_ONE_UNAME, gs.playerOneUserName);
+		out.put(Netwrk.PLAYER_TWO_UNAME, gs.playerTwoUserName);
+		out.put(Netwrk.PLAYER_ONE_WINS, gs.playerOneWins);
+		out.put(Netwrk.PLAYER_TWO_WINS, gs.playerTwoWins);
+		out.put(Netwrk.PLAYER_ONE_LOSSES, gs.playerOneLosses);
+		out.put(Netwrk.PLAYER_TWO_LOSSES, gs.playerTwoLosses);
+		out.put(Netwrk.PLAYER_ONE_TIES, gs.playerOneTies);
+		out.put(Netwrk.PLAYER_TWO_TIES, gs.playerTwoTies);
+		out.put(Netwrk.GAME_ID, gs.gameID);
+		out.put(Netwrk.PLAYER_ONE_BOARD, gs.board.getBoard()[0]);
+		out.put(Netwrk.PLAYER_TWO_BOARD, gs.board.getBoard()[1]);
+		out.put(Netwrk.KINGS_BOARD, gs.board.getBoard()[2]);
+		
 		sendPacket(out);
 		
 	}
