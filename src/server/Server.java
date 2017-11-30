@@ -55,9 +55,9 @@ public class Server {
 			ssocket = new ServerSocket(port);
 			
 			MainLoop: for(;;) {
-				System.out.printf("\nwaiting for new player to connect...\n");
+				System.out.printf("\nwaiting for new client to connect...\n");
 				socket = ssocket.accept();
-				System.out.printf("connected to new player\n");
+				System.out.printf("connected to new client\n");
 				
 				buffReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				
@@ -88,8 +88,9 @@ public class Server {
 				opcode = ((Long)data.get(Netwrk.OPCODE)).byteValue();
 				
 				if(opcode == Netwrk.HELLO) {
-					ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
-					if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
+					System.out.printf("Client is a player\n");
+					//ArrayList<String> loginInfo = Database.login((String)data.get(Netwrk.USER_NAME), (String)data.get(Netwrk.PASSWORD));
+					//if(loginInfo.isEmpty() || Integer.parseInt(loginInfo.get(0))==0) continue MainLoop;
 					
 					playerName = (String)data.get(Netwrk.USER_NAME);
 					
@@ -108,9 +109,9 @@ public class Server {
 							
 							tempGame.getGameState().PlayerTwo = tempPlayer;
 							tempGame.getGameState().playerTwoUserName = playerName;
-							tempGame.getGameState().playerTwoWins = Integer.parseInt(loginInfo.get(1));
-							tempGame.getGameState().playerTwoLosses = Integer.parseInt(loginInfo.get(2));
-							tempGame.getGameState().playerTwoTies = Integer.parseInt(loginInfo.get(3));
+							//tempGame.getGameState().playerTwoWins = Integer.parseInt(loginInfo.get(1));
+							//tempGame.getGameState().playerTwoLosses = Integer.parseInt(loginInfo.get(2));
+							//tempGame.getGameState().playerTwoTies = Integer.parseInt(loginInfo.get(3));
 							
 							System.out.printf("%s joined game %d\n", playerName, gameID);
 						} else {
@@ -130,9 +131,9 @@ public class Server {
 						tempGS = new GameState();
 						tempGS.gameID = gameID;
 						tempGS.playerOneUserName = playerName;
-						tempGS.playerOneWins = Integer.parseInt(loginInfo.get(1));
-						tempGS.playerOneLosses = Integer.parseInt(loginInfo.get(2));
-						tempGS.playerOneTies = Integer.parseInt(loginInfo.get(3));
+						//tempGS.playerOneWins = Integer.parseInt(loginInfo.get(1));
+						//tempGS.playerOneLosses = Integer.parseInt(loginInfo.get(2));
+						//tempGS.playerOneTies = Integer.parseInt(loginInfo.get(3));
 						
 						tempPlayer = new ServerPlayer();
 						gamePort = tempPlayer.getServerPort();
@@ -175,11 +176,20 @@ public class Server {
 						
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerOne).sendPacket(out); 
 						((NetworkedPlayer) games.get(gameID).getGameState().PlayerTwo).sendPacket(out);
-						games.get(gameID).start(); //needs its own thread
+						
+						Thread thread = new Thread(new Runnable() {
+						    @Override
+						    public void run() {
+						    	Game game = games.get(gameID);
+								game.start();
+						    }
+						});
+						thread.start();
 						
 						System.out.printf("Game %d started\n", gameID);
 					}
 				} else if(opcode == Netwrk.SERVER_LIST_REQUEST) {
+					System.out.printf("Client requested open games...");
 					out.put(Netwrk.OPCODE, Netwrk.SERVER_LIST_REQUEST);
 					
 					printer = new PrintWriter(socket.getOutputStream(), true);
@@ -204,6 +214,7 @@ public class Server {
 					
 				out.clear();
 				socket.close();
+				System.out.printf("sent open game list to player\n");
 			}
 			
 		} catch (IOException e) {

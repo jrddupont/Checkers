@@ -50,6 +50,7 @@ public class ServerPlayer extends NetworkedPlayer
 		out.put(Netwrk.PLAYER_ONE_BOARD, board.getBoard()[0]);
 		out.put(Netwrk.PLAYER_TWO_BOARD, board.getBoard()[1]);
 		out.put(Netwrk.KINGS_BOARD, board.getBoard()[2]);
+		
 		sendPacket(out);
 		processPacket(getMail());
 		return this.board;

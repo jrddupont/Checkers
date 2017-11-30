@@ -48,6 +48,7 @@ public class Game {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				running = false;
+				gs.endStatus = gs.EXIT_REQUESTED;
 			}
 		}
 	}
