@@ -11,6 +11,7 @@ import util.Board;
 import util.GameState;
 import util.NetworkedPlayer;
 import util.Netwrk;
+import util.Player;
 import util.PlayerDisconnectException;
 
 public class ClientPlayer extends NetworkedPlayer implements Runnable{
@@ -113,6 +114,22 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 			
 		case Netwrk.GAME_END:
 			gameState.endStatus = gameState.GAME_ENDED;			
+			
+			gameState.playerOneUserName = json.get(Netwrk.PLAYER_ONE_UNAME).toString();
+			gameState.playerTwoUserName = json.get(Netwrk.PLAYER_TWO_UNAME).toString();
+			gameState.playerOneWins = ((Long) json.get(Netwrk.PLAYER_ONE_WINS)).intValue();
+			gameState.playerTwoWins = ((Long) json.get(Netwrk.PLAYER_TWO_WINS)).intValue();
+			gameState.playerOneLosses = ((Long) json.get(Netwrk.PLAYER_ONE_LOSSES)).intValue();
+			gameState.playerTwoLosses = ((Long) json.get(Netwrk.PLAYER_TWO_LOSSES)).intValue();
+			gameState.playerOneTies = ((Long) json.get(Netwrk.PLAYER_ONE_TIES)).intValue();
+			gameState.playerTwoTies = ((Long) json.get(Netwrk.PLAYER_TWO_TIES)).intValue();
+			gameState.gameID = ((Long) json.get(Netwrk.GAME_ID)).intValue();			
+			gameState.board.getBoard()[0] = ((Long) json.get(Netwrk.PLAYER_ONE_BOARD)).intValue();
+			gameState.board.getBoard()[1] = ((Long) json.get(Netwrk.PLAYER_TWO_BOARD)).intValue();
+			gameState.board.getBoard()[2] = ((Long) json.get(Netwrk.KINGS_BOARD)).intValue();
+			
+			gameEnd(gameState);
+			
 			break;
 			
 		case Netwrk.REMATCH_REQUEST:
@@ -200,9 +217,18 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 	}
 
 	@Override
-	public void gameEnd(GameState g) {
-		// TODO Auto-generated method stub
-		
+	public void gameEnd(GameState g) {		
+		if(g.PlayerOne == null) {
+			if(g.turn == 0)
+				;// you lost
+			else
+				;//you win
+		} else {
+			if(g.turn == 0)
+				;// you lost
+			else
+				;//you win
+		}
 	}
 }
 
