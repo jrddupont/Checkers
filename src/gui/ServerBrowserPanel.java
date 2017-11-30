@@ -49,8 +49,9 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 	
 	JButton mainMenuButton =			new JButton("Main menu");
 	
-	public ServerBrowserPanel(){
+	public ServerBrowserPanel(String ip){
 		super();
+		Netwrk.IP_ADDRESS = ip;
 		serverTextField.setColumns(100);
 		serverTextField.setMaximumSize( new Dimension(serverTextField.getPreferredSize().width, connectButton.getPreferredSize().height)  );
 		

@@ -62,7 +62,8 @@ public class MenuPanel extends AbstractMenuPanel{
 		onlinePlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ServerBrowserPanel sbp = new ServerBrowserPanel();
+				String ip = JOptionPane.showInputDialog("Please enter an IP");
+				ServerBrowserPanel sbp = new ServerBrowserPanel(ip);
 				Driver.switchMenu(sbp);
 				sbp.init();
 			}
