@@ -63,6 +63,10 @@ public class MenuPanel extends AbstractMenuPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String ip = JOptionPane.showInputDialog("Please enter an IP");
+				if(ip=="")
+				{
+					ip="127.0.0.1";
+				}
 				ServerBrowserPanel sbp = new ServerBrowserPanel(ip);
 				Driver.switchMenu(sbp);
 				sbp.init();
