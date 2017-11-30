@@ -44,7 +44,7 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 		}
 		try {
 			MessageDigest hashObj = MessageDigest.getInstance("SHA-256");
-			hashObj.update(password.getBytes());
+			hashObj.update((name+password).getBytes());
 			newPass = new String(hashObj.digest());
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
