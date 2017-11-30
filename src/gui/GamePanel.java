@@ -110,11 +110,21 @@ public class GamePanel extends AbstractMenuPanel{
 						}
 						if(waitingForMove && playerAtCurPos == currentPlayer.playerNumber){
 							if(getBit( gameState.board.getMovablePieces(currentPlayer.playerNumber), curPos) == 1){
-								g.setColor(Color.GRAY);
-								Graphics2D g2 = (Graphics2D) g;
-								int strokeSize = 6;
-				                g2.setStroke(new BasicStroke(strokeSize));
-								g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+								if(isJumping){
+									if(curPos == selectedPiece){
+										g.setColor(Color.GRAY);
+										Graphics2D g2 = (Graphics2D) g;
+										int strokeSize = 6;
+						                g2.setStroke(new BasicStroke(strokeSize));
+										g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+									}
+								}else{
+									g.setColor(Color.GRAY);
+									Graphics2D g2 = (Graphics2D) g;
+									int strokeSize = 6;
+					                g2.setStroke(new BasicStroke(strokeSize));
+									g2.drawOval(currentDrawX + strokeSize/2, currentDrawY + strokeSize/2, cellSize - strokeSize, cellSize - strokeSize);
+								}
 							}
 						}
 						

@@ -62,7 +62,9 @@ public class MenuPanel extends AbstractMenuPanel{
 		onlinePlayButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Driver.switchMenu(new ServerBrowserPanel());
+				ServerBrowserPanel sbp = new ServerBrowserPanel();
+				Driver.switchMenu(sbp);
+				sbp.init();
 			}
 		});
 		optionsButton.addActionListener(new ActionListener() {
@@ -135,7 +137,7 @@ public class MenuPanel extends AbstractMenuPanel{
 		    @Override
 		    public void run() {
 		    	Game game = new Game(gameState);
-				game.start();        
+				game.start();
 		    }
 		});
 		thread.start();

@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,7 +35,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import util.GameState;
 import util.Netwrk;
 import util.PlayerDisconnectException;
 import client.ClientPlayer;
@@ -79,7 +79,6 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 		add(Box.createRigidArea(new Dimension(0, padding)));
 		add(mainMenuButton);
 		
-		initServerList();
 
 		serversList.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -160,6 +159,10 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 		
 	}
 	
+	public void init() {
+		initServerList();
+	}
+	
 	private void initServerList(){
 //		listModel.addElement("Example");
 //		listModel.addElement("servers");
@@ -228,10 +231,13 @@ public class ServerBrowserPanel extends AbstractMenuPanel{
 		} catch (UnknownHostException e){
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e){
+		} catch (ParseException e){
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (ParseException e){
+		} catch (ConnectException e){
+			JOptionPane.showMessageDialog(null, "Game server not found.");
+			Driver.switchMenu(new MenuPanel());
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

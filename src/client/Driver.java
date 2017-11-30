@@ -25,12 +25,8 @@ public class Driver  {
     }
     
     public static void switchMenu(AbstractMenuPanel panel){
-    	System.out.printf("abc Switiching panels\n");
-    	
     	mainFrame.getContentPane().removeAll();
-    	
     	mainFrame.getContentPane().add(panel);
-    	
     	mainFrame.getContentPane().revalidate();
     	mainFrame.getContentPane().repaint();
     }
