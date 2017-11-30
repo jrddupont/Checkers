@@ -93,9 +93,13 @@ public class Board {
 	}
 	
 	public ArrayList<Board> getJumpMoves(int player) {
-		ArrayList<Board> moveList =  getJumpMoves(player,  player==PLAYER_1 ? 1 : -1, board[player]);
-		if ((board[player] & board[KINGS]) !=0) {
-			moveList.addAll(getJumpMoves(player, player==PLAYER_1 ? -1 : 1, board[player] & board[KINGS]));
+		return getJumpMoves(player, board[player]);
+	}
+	
+	private ArrayList<Board> getJumpMoves(int player, int pieceMask) {
+		ArrayList<Board> moveList = getJumpMoves(player, player==PLAYER_1 ? 1 : -1, pieceMask);
+		if ((pieceMask & board[KINGS]) !=0) {
+			moveList.addAll(getJumpMoves(player, player==PLAYER_1 ? -1 : 1, pieceMask & board[KINGS]));
 		}
 		return moveList;
 	}
@@ -165,10 +169,10 @@ public class Board {
 				newBoardArr[KINGS] = x | newBoardArr[KINGS] & ~(shift(x, -(offset2+offset1)));
 			}
 			Board nb = new Board(newBoardArr);
-			int oldKings = boardArr[KINGS];
+			int oldKings = newBoardArr[KINGS];
 			nb.calculateKings(player);
-			ArrayList<Board> moreJumps = nb.getJumpMoves(player);
-			if (oldKings == boardArr[KINGS] && moreJumps.size() != 0) {
+			ArrayList<Board> moreJumps = nb.getJumpMoves(player, x);
+			if (oldKings == newBoardArr[KINGS] && moreJumps.size() != 0) {
 				boardList.addAll(moreJumps);
 			} else {
 				boardList.add(nb);
@@ -183,7 +187,7 @@ public class Board {
 		return String.format("%32s", Integer.toBinaryString(Integer.reverse(b))).replace(' ', '0'); //string conversion cancer
 	}
 
-	public static void shittyPrint(int b) {
+	public static void uglyPrint(int b) {
 		String boardStr = boardIntToLine(b);
 		for (int row = 0; row < 8; row++) {
 			System.out.println(boardStr.substring(row*4, row*4+4));
