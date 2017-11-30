@@ -1,6 +1,8 @@
 package client;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.json.simple.JSONObject;
 
@@ -34,16 +36,25 @@ public class ClientPlayer extends NetworkedPlayer implements Runnable{
 	
 	public ClientPlayer(String name, String password, int id)
 	{
+		String newPass="";
 		try {
 			socket = new Socket(Netwrk.IP_ADDRESS, port);
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			MessageDigest hashObj = MessageDigest.getInstance("SHA-256");
+			hashObj.update(password.getBytes());
+			newPass = new String(hashObj.digest());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		out.put(Netwrk.OPCODE, Netwrk.HELLO);
 		out.put(Netwrk.GAME_ID, id);
 		out.put(Netwrk.USER_NAME, name);
-		out.put(Netwrk.PASSWORD, password);
+		out.put(Netwrk.PASSWORD, newPass);
 		
 		this.sendPacket(out);
 	}
