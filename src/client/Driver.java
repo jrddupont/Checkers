@@ -10,11 +10,13 @@ import javax.swing.WindowConstants;
 import util.Settings;
 
 public class Driver  {
+	// Makes a new driver and instantiates the static setting object
     public static void main(String[] args){
     	new Driver();
     	Settings.currentTheme = new Theme();
     }
     
+    // Sets up the main frame
     public static JFrame mainFrame = new JFrame();
     public Driver(){
     	mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -24,6 +26,10 @@ public class Driver  {
 		mainFrame.setVisible(true);
     }
     
+    /**
+     * Given a panel, replace everything in frame with it.
+     * @param panel What panel to switch to
+     */
     public static void switchMenu(AbstractMenuPanel panel){
     	mainFrame.getContentPane().removeAll();
     	mainFrame.getContentPane().add(panel);

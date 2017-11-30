@@ -32,6 +32,10 @@ import org.json.simple.parser.ParseException;
 import util.Settings;
 import client.Driver;
 
+/**
+ * Panel that contains all the options regarding theme selection and editing
+ *
+ */
 @SuppressWarnings("serial")
 public class SettingsPanel extends AbstractMenuPanel{
 	
@@ -58,6 +62,10 @@ public class SettingsPanel extends AbstractMenuPanel{
 	ThemePreviewPanel themePreviewPanel;
 	
 	
+	/**
+	 * Creates a new settings panel and adds lots and lots of buttons and options to it. I will comment the action listeners because they actually
+	 * contain code.
+	 */
 	public SettingsPanel(){
 		super();
 		padding /= 2;
@@ -108,6 +116,7 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    add(Box.createRigidArea(new Dimension(0, padding)));
 	    add(mainMenuButton);
 	    
+	    // Dropdown menu to select from known themes. It will set the current theme to whatever is chosen.
 	    themeChoiceSelector.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -122,6 +131,8 @@ public class SettingsPanel extends AbstractMenuPanel{
 			}
 		});
 	    
+	    // Puts all the theme data into a JSON object and puts that in a map of all themes
+	    // This overrides themes with the same name, so be careful
 	    saveThemeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -133,6 +144,7 @@ public class SettingsPanel extends AbstractMenuPanel{
 			}
 		});
 	    
+	    // Removes the currently selected theme from the map of themes
 	    removeThemeButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -142,6 +154,7 @@ public class SettingsPanel extends AbstractMenuPanel{
 			}
 		});
 	    
+	    // Enables and disables the save button based on if there is any text in the theme name text input
 	    themeNameField.getDocument().addDocumentListener(new DocumentListener() {
 	    	@Override
 	    	public void changedUpdate(DocumentEvent e) {}
@@ -154,7 +167,8 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    		saveThemeButton.setEnabled(themeNameField.getText().length() > 0);
 	    	}
 	    });
-
+	    
+	    // The next 5 listeners all do the same thing, they just open a color selector for the relevant color option
 	    changeLightColorButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -235,6 +249,7 @@ public class SettingsPanel extends AbstractMenuPanel{
 			}
 		});
 	    
+	    // Switch the panel to the menu panel
 	    mainMenuButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -243,6 +258,10 @@ public class SettingsPanel extends AbstractMenuPanel{
 		});
 	}
 	
+	
+	/**
+	 * Removes all items from the dropdown menu and replaces them with all the keys in the theme map
+	 */
 	private void refreshComboBox(){
 		
 		if(themes.size() == 0){
@@ -266,6 +285,9 @@ public class SettingsPanel extends AbstractMenuPanel{
 	    Settings.currentTheme = themes.get(choices[0]);
 	}
 	
+	/**
+	 * Loads the JSON file containing theme data and replaces whatever is in themes with the new data
+	 */
 	private void loadThemes(){
 		themes.clear();
 		JSONParser parser = new JSONParser();
@@ -281,6 +303,9 @@ public class SettingsPanel extends AbstractMenuPanel{
 		} catch (IOException | ParseException e) { e.printStackTrace(); }
 	}
 	
+	/**
+	 * Saves the current theme map to a text file in JSON
+	 */
 	@SuppressWarnings({ "unchecked" })
 	private void saveThemes() {
 		JSONObject output = new JSONObject();
@@ -307,6 +332,10 @@ public class SettingsPanel extends AbstractMenuPanel{
 	}
 	
 	
+	/**
+	 * @author yb5243yv
+	 *
+	 */
 	private class SmallColorChooser extends JColorChooser{
 		public SmallColorChooser(){
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

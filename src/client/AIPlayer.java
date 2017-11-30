@@ -4,7 +4,7 @@ import util.Board;
 import util.PlayerDisconnectException;
 
 public class AIPlayer extends LocalPlayer {
-	public boolean rematch = true; //important!
+	public boolean rematch = true;
 	
 	@Override
 	public Board getMove(Board board) throws PlayerDisconnectException {
