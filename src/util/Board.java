@@ -51,10 +51,19 @@ public class Board {
 		
 		if (piecesCanJump!=0) return piecesCanJump;
 		
-		int dir = player==PLAYER_1 ? 1 : -1;
-		return (shift(~board[player] & ~board[(player+1) % 2], -dir*(4-dir)) & board[player] & mask3Neg5)
-				| (shift(~board[player] & ~board[(player+1) % 2], -dir*(4+dir)) & board[player] & mask5Neg3)
-				| (shift(~board[player] & ~board[(player+1) % 2], -dir*4) & board[player]);
+		int piecesCanMove = 0;
+		
+		for (int i = 0; i < 32; i++) {
+			if (getNonJumps(player, i) != 0) {
+				piecesCanMove|= 1<<i;
+			}
+		}
+		
+		return piecesCanMove;
+		
+//		return (shift(~board[player] & ~board[(player+1) % 2], -dir*(4-dir)) & board[player] & mask3Neg5)
+//				| (shift(~board[player] & ~board[(player+1) % 2], -dir*(4+dir)) & board[player] & mask5Neg3)
+//				| (shift(~board[player] & ~board[(player+1) % 2], -dir*4) & board[player]);
 	}
 
 	public ArrayList<Board> getForwardMoves(int player) {
@@ -276,8 +285,18 @@ public class Board {
 			return output;
 		}
 	}
-	private int getNonJumps(int player, int pieceIndex) { //mask of all positions that may be moved into without jumping
+	
+	
+	private int getNonJumps(int player, int pieceIndex) {
 		int dir = player==PLAYER_1 ? 1 : -1;
+		int moves = getNonJumps(player, dir, pieceIndex);
+		if ((board[KINGS]&(1<<pieceIndex))!=0) {
+			moves |= getNonJumps(player, dir*-1, pieceIndex);
+		}
+		return moves;
+	}
+	
+	private int getNonJumps(int player, int dir, int pieceIndex) { //mask of all positions that may be moved into without jumping
 		int piece = 1<<pieceIndex;
 		return (~board[player] & ~board[(player+1) % 2] & shift(piece & mask3Neg5 & board[player], dir*(4 - dir)))
 				| (~board[player] & ~board[(player+1) % 2] & shift(piece & mask5Neg3 & board[player], dir*(4 + dir))) 
@@ -288,7 +307,7 @@ public class Board {
 		int dir = player==PLAYER_1 ? 1 : -1;
 		int moves = getJumps(player, dir, pieceIndex);
 		if ((board[KINGS]&(1<<pieceIndex))!=0) {
-			moves &= getJumps(player, dir*-1, pieceIndex);
+			moves |= getJumps(player, dir*-1, pieceIndex);
 		}
 		return moves;
 	}
@@ -353,12 +372,22 @@ public class Board {
 
 	
 	public int jumpAndGetJumps(int from, int jumpedTo){ // Mask of moves a piece can make after jumping to a position (Also mutates the board)
+		boolean wasNotAKing = (board[KINGS] & (1<<from)) == 0;
 		moveTo(from, jumpedTo);
+		boolean isAKing = (board[KINGS] & (1<<jumpedTo)) != 0;
+		
 		int mask = 1<<getBetween(from, jumpedTo);
 		for(int i=0; i<board.length; i++) {
 			board[i] &= ~mask;
 		}
-		return getJumps(playerAt(jumpedTo), jumpedTo);
+	
+		if (isAKing && wasNotAKing) {
+			return 0;
+		}
+		
+		else {
+			return getJumps(playerAt(jumpedTo), jumpedTo);
+		}
 	}
 
 	public void moveTo(int from, int to){ // Mutate the board into new board

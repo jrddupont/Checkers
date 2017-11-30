@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class Server {
 		
 		try {
 			System.out.printf("Starting server\n");
-			ssocket = new ServerSocket(port);
+			ssocket = new ServerSocket(port, 256, Inet4Address.getByName(Netwrk.IP_ADDRESS));
 			
 			MainLoop: for(;;) {
 				System.out.printf("\nwaiting for new client to connect...\n");
